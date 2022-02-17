@@ -19,7 +19,7 @@ export async function main() {
         const version = await getVersion();
         console.log(`pyright ${version}`);
 
-        const { args, noComments } = await getArgs(version);
+        const { args, noComments, treatPartialAsWarning } = await getArgs(version);
 
         if (noComments) {
             // Comments are disabled, just run as a subprocess passing things through.
@@ -45,8 +45,17 @@ export async function main() {
         }
 
         const report = Report.parse(JSON.parse(stdout));
+        var { errorCount, warningCount, informationCount } = report.summary;
 
         report.generalDiagnostics.forEach((diag) => {
+            if (treatPartialAsWarning && diag.severity === 'error') {
+                if (diag.message.includes('partially unknown')) {
+                    diag.severity = 'warning';
+                    errorCount -= 1;
+                    warningCount += 1;
+                }
+            }
+
             console.log(diagnosticToString(diag, /* forCommand */ false));
 
             if (diag.severity === 'information') {
@@ -69,8 +78,6 @@ export async function main() {
                 message
             );
         });
-
-        const { errorCount, warningCount, informationCount } = report.summary;
 
         console.log(
             `${errorCount} ${errorCount === 1 ? 'error' : 'errors'}, ` +
@@ -154,9 +161,12 @@ async function getArgs(version: SemVer) {
         args.push(...stringArgv(extraArgs));
     }
 
+    const treatPartialAsWarning = getBooleanInput('warn-partial', false);
+
     return {
         args,
         noComments,
+        treatPartialAsWarning
     };
 }
 

@@ -45,4 +45,8 @@ inputs:
     description: 'Disable issue/commit comments'
     required: false
     default: 'false'
+  warn-partial:
+    description: 'Treat partial unknowns as a warning, not an error.'
+    required: false
+    default: 'false'
 ```

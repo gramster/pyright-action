@@ -6199,7 +6199,7 @@ async function main() {
     }
     const version = await getVersion();
     console.log(`pyright ${version}`);
-    const { args, noComments } = await getArgs(version);
+    const { args, noComments, treatPartialAsWarning } = await getArgs(version);
     if (noComments) {
       const { status: status2 } = cp.spawnSync(process.execPath, args, {
         stdio: ["ignore", "inherit", "inherit"]
@@ -6218,8 +6218,16 @@ async function main() {
       return;
     }
     const report = Report.parse(JSON.parse(stdout));
+    var { errorCount, warningCount, informationCount } = report.summary;
     report.generalDiagnostics.forEach((diag) => {
       var _a, _b, _c, _d;
+      if (treatPartialAsWarning && diag.severity === "error") {
+        if (diag.message.includes("partially unknown")) {
+          diag.severity = "warning";
+          errorCount -= 1;
+          warningCount += 1;
+        }
+      }
       console.log(diagnosticToString(diag, false));
       if (diag.severity === "information") {
         return;
@@ -6233,7 +6241,6 @@ async function main() {
         col: col + 1
       }, message);
     });
-    const { errorCount, warningCount, informationCount } = report.summary;
     console.log(`${errorCount} ${errorCount === 1 ? "error" : "errors"}, ${warningCount} ${warningCount === 1 ? "warning" : "warnings"}, ${informationCount} ${informationCount === 1 ? "info" : "infos"} `);
     if (status !== 0) {
       core.setFailed(`${errorCount} ${errorCount === 1 ? "error" : "errors"}`);
@@ -6297,9 +6304,11 @@ async function getArgs(version) {
   if (extraArgs) {
     args.push(...(0, import_string_argv.default)(extraArgs));
   }
+  const treatPartialAsWarning = getBooleanInput("warn-partial", false);
   return {
     args,
-    noComments
+    noComments,
+    treatPartialAsWarning
   };
 }
 function getBooleanInput(name, defaultValue) {
