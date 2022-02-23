@@ -6209,7 +6209,7 @@ async function main() {
       }
       return;
     }
-    const { status, stdout } = cp.spawnSync(process.execPath, args, {
+    let { status, stdout } = cp.spawnSync(process.execPath, args, {
       encoding: "utf-8",
       stdio: ["ignore", "pipe", "inherit"]
     });
@@ -6218,7 +6218,7 @@ async function main() {
       return;
     }
     const report = Report.parse(JSON.parse(stdout));
-    var { errorCount, warningCount, informationCount } = report.summary;
+    let { errorCount, warningCount, informationCount } = report.summary;
     report.generalDiagnostics.forEach((diag) => {
       var _a, _b, _c, _d;
       if (treatPartialAsWarning && diag.severity === "error") {
@@ -6226,6 +6226,9 @@ async function main() {
           diag.severity = "warning";
           errorCount -= 1;
           warningCount += 1;
+          if (errorCount === 0) {
+            status = 0;
+          }
         }
       }
       console.log(diagnosticToString(diag, false));
