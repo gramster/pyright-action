@@ -33,7 +33,7 @@ export async function main() {
             return;
         }
 
-        const { status, stdout } = cp.spawnSync(process.execPath, args, {
+        var { status, stdout } = cp.spawnSync(process.execPath, args, {
             encoding: 'utf-8',
             stdio: ['ignore', 'pipe', 'inherit'],
         });
@@ -53,6 +53,9 @@ export async function main() {
                     diag.severity = 'warning';
                     errorCount -= 1;
                     warningCount += 1;
+                    if (errorCount == 0) {
+                        status = 0;
+                    }
                 }
             }
 
