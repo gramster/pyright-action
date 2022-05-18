@@ -1,17 +1,11 @@
 {
+    "extends": "@tsconfig/node16/tsconfig.json",
     "compilerOptions": {
-        "target": "ES2019",
-        "module": "CommonJS",
-        "lib": ["ES2019"],
-        "rootDir": "./src",
         "noEmit": true,
-        "strict": true,
         "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
         "noPropertyAccessFromIndexSignature": true,
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
-    }
+        "resolveJsonModule": true
+    },
+    "exclude": ["dist", "node_modules"]
 }

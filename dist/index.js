@@ -21,21 +21,18 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
-var __reExport = (target, module2, copyDefault, desc) => {
-  if (module2 && typeof module2 === "object" || typeof module2 === "function") {
-    for (let key of __getOwnPropNames(module2))
-      if (!__hasOwnProp.call(target, key) && (copyDefault || key !== "default"))
-        __defProp(target, key, { get: () => module2[key], enumerable: !(desc = __getOwnPropDesc(module2, key)) || desc.enumerable });
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
   }
-  return target;
+  return to;
 };
-var __toESM = (module2, isNodeMode) => {
-  return __reExport(__markAsModule(__defProp(module2 != null ? __create(__getProtoOf(module2)) : {}, "default", !isNodeMode && module2 && module2.__esModule ? { get: () => module2.default, enumerable: true } : { value: module2, enumerable: true })), module2);
-};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
 
 // node_modules/@actions/core/lib/utils.js
 var require_utils = __commonJS({
@@ -209,34 +206,36 @@ var require_file_command = __commonJS({
   }
 });
 
-// node_modules/@actions/http-client/proxy.js
+// node_modules/@actions/http-client/lib/proxy.js
 var require_proxy = __commonJS({
-  "node_modules/@actions/http-client/proxy.js"(exports) {
+  "node_modules/@actions/http-client/lib/proxy.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.checkBypass = exports.getProxyUrl = void 0;
     function getProxyUrl(reqUrl) {
-      let usingSsl = reqUrl.protocol === "https:";
-      let proxyUrl;
+      const usingSsl = reqUrl.protocol === "https:";
       if (checkBypass(reqUrl)) {
-        return proxyUrl;
+        return void 0;
       }
-      let proxyVar;
-      if (usingSsl) {
-        proxyVar = process.env["https_proxy"] || process.env["HTTPS_PROXY"];
-      } else {
-        proxyVar = process.env["http_proxy"] || process.env["HTTP_PROXY"];
-      }
+      const proxyVar = (() => {
+        if (usingSsl) {
+          return process.env["https_proxy"] || process.env["HTTPS_PROXY"];
+        } else {
+          return process.env["http_proxy"] || process.env["HTTP_PROXY"];
+        }
+      })();
       if (proxyVar) {
-        proxyUrl = new URL(proxyVar);
+        return new URL(proxyVar);
+      } else {
+        return void 0;
       }
-      return proxyUrl;
     }
     exports.getProxyUrl = getProxyUrl;
     function checkBypass(reqUrl) {
       if (!reqUrl.hostname) {
         return false;
       }
-      let noProxy = process.env["no_proxy"] || process.env["NO_PROXY"] || "";
+      const noProxy = process.env["no_proxy"] || process.env["NO_PROXY"] || "";
       if (!noProxy) {
         return false;
       }
@@ -248,11 +247,11 @@ var require_proxy = __commonJS({
       } else if (reqUrl.protocol === "https:") {
         reqPort = 443;
       }
-      let upperReqHosts = [reqUrl.hostname.toUpperCase()];
+      const upperReqHosts = [reqUrl.hostname.toUpperCase()];
       if (typeof reqPort === "number") {
         upperReqHosts.push(`${upperReqHosts[0]}:${reqPort}`);
       }
-      for (let upperNoProxyItem of noProxy.split(",").map((x) => x.trim().toUpperCase()).filter((x) => x)) {
+      for (const upperNoProxyItem of noProxy.split(",").map((x) => x.trim().toUpperCase()).filter((x) => x)) {
         if (upperReqHosts.some((x) => x === upperNoProxyItem)) {
           return true;
         }
@@ -272,7 +271,7 @@ var require_tunnel = __commonJS({
     var http = require("http");
     var https = require("https");
     var events = require("events");
-    var assert = require("assert");
+    var assert2 = require("assert");
     var util = require("util");
     exports.httpOverHttp = httpOverHttp;
     exports.httpsOverHttp = httpsOverHttp;
@@ -493,45 +492,101 @@ var require_tunnel2 = __commonJS({
   }
 });
 
-// node_modules/@actions/http-client/index.js
-var require_http_client = __commonJS({
-  "node_modules/@actions/http-client/index.js"(exports) {
+// node_modules/@actions/http-client/lib/index.js
+var require_lib = __commonJS({
+  "node_modules/@actions/http-client/lib/index.js"(exports) {
     "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      Object.defineProperty(o, k2, { enumerable: true, get: function() {
+        return m[k];
+      } });
+    } : function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      o[k2] = m[k];
+    });
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    } : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule)
+        return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod)
+          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
+            __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
-    var http = require("http");
-    var https = require("https");
-    var pm = require_proxy();
-    var tunnel;
-    var HttpCodes;
-    (function(HttpCodes2) {
-      HttpCodes2[HttpCodes2["OK"] = 200] = "OK";
-      HttpCodes2[HttpCodes2["MultipleChoices"] = 300] = "MultipleChoices";
-      HttpCodes2[HttpCodes2["MovedPermanently"] = 301] = "MovedPermanently";
-      HttpCodes2[HttpCodes2["ResourceMoved"] = 302] = "ResourceMoved";
-      HttpCodes2[HttpCodes2["SeeOther"] = 303] = "SeeOther";
-      HttpCodes2[HttpCodes2["NotModified"] = 304] = "NotModified";
-      HttpCodes2[HttpCodes2["UseProxy"] = 305] = "UseProxy";
-      HttpCodes2[HttpCodes2["SwitchProxy"] = 306] = "SwitchProxy";
-      HttpCodes2[HttpCodes2["TemporaryRedirect"] = 307] = "TemporaryRedirect";
-      HttpCodes2[HttpCodes2["PermanentRedirect"] = 308] = "PermanentRedirect";
-      HttpCodes2[HttpCodes2["BadRequest"] = 400] = "BadRequest";
-      HttpCodes2[HttpCodes2["Unauthorized"] = 401] = "Unauthorized";
-      HttpCodes2[HttpCodes2["PaymentRequired"] = 402] = "PaymentRequired";
-      HttpCodes2[HttpCodes2["Forbidden"] = 403] = "Forbidden";
-      HttpCodes2[HttpCodes2["NotFound"] = 404] = "NotFound";
-      HttpCodes2[HttpCodes2["MethodNotAllowed"] = 405] = "MethodNotAllowed";
-      HttpCodes2[HttpCodes2["NotAcceptable"] = 406] = "NotAcceptable";
-      HttpCodes2[HttpCodes2["ProxyAuthenticationRequired"] = 407] = "ProxyAuthenticationRequired";
-      HttpCodes2[HttpCodes2["RequestTimeout"] = 408] = "RequestTimeout";
-      HttpCodes2[HttpCodes2["Conflict"] = 409] = "Conflict";
-      HttpCodes2[HttpCodes2["Gone"] = 410] = "Gone";
-      HttpCodes2[HttpCodes2["TooManyRequests"] = 429] = "TooManyRequests";
-      HttpCodes2[HttpCodes2["InternalServerError"] = 500] = "InternalServerError";
-      HttpCodes2[HttpCodes2["NotImplemented"] = 501] = "NotImplemented";
-      HttpCodes2[HttpCodes2["BadGateway"] = 502] = "BadGateway";
-      HttpCodes2[HttpCodes2["ServiceUnavailable"] = 503] = "ServiceUnavailable";
-      HttpCodes2[HttpCodes2["GatewayTimeout"] = 504] = "GatewayTimeout";
-    })(HttpCodes = exports.HttpCodes || (exports.HttpCodes = {}));
+    exports.HttpClient = exports.isHttps = exports.HttpClientResponse = exports.HttpClientError = exports.getProxyUrl = exports.MediaTypes = exports.Headers = exports.HttpCodes = void 0;
+    var http = __importStar(require("http"));
+    var https = __importStar(require("https"));
+    var pm = __importStar(require_proxy());
+    var tunnel = __importStar(require_tunnel2());
+    var HttpCodes2;
+    (function(HttpCodes3) {
+      HttpCodes3[HttpCodes3["OK"] = 200] = "OK";
+      HttpCodes3[HttpCodes3["MultipleChoices"] = 300] = "MultipleChoices";
+      HttpCodes3[HttpCodes3["MovedPermanently"] = 301] = "MovedPermanently";
+      HttpCodes3[HttpCodes3["ResourceMoved"] = 302] = "ResourceMoved";
+      HttpCodes3[HttpCodes3["SeeOther"] = 303] = "SeeOther";
+      HttpCodes3[HttpCodes3["NotModified"] = 304] = "NotModified";
+      HttpCodes3[HttpCodes3["UseProxy"] = 305] = "UseProxy";
+      HttpCodes3[HttpCodes3["SwitchProxy"] = 306] = "SwitchProxy";
+      HttpCodes3[HttpCodes3["TemporaryRedirect"] = 307] = "TemporaryRedirect";
+      HttpCodes3[HttpCodes3["PermanentRedirect"] = 308] = "PermanentRedirect";
+      HttpCodes3[HttpCodes3["BadRequest"] = 400] = "BadRequest";
+      HttpCodes3[HttpCodes3["Unauthorized"] = 401] = "Unauthorized";
+      HttpCodes3[HttpCodes3["PaymentRequired"] = 402] = "PaymentRequired";
+      HttpCodes3[HttpCodes3["Forbidden"] = 403] = "Forbidden";
+      HttpCodes3[HttpCodes3["NotFound"] = 404] = "NotFound";
+      HttpCodes3[HttpCodes3["MethodNotAllowed"] = 405] = "MethodNotAllowed";
+      HttpCodes3[HttpCodes3["NotAcceptable"] = 406] = "NotAcceptable";
+      HttpCodes3[HttpCodes3["ProxyAuthenticationRequired"] = 407] = "ProxyAuthenticationRequired";
+      HttpCodes3[HttpCodes3["RequestTimeout"] = 408] = "RequestTimeout";
+      HttpCodes3[HttpCodes3["Conflict"] = 409] = "Conflict";
+      HttpCodes3[HttpCodes3["Gone"] = 410] = "Gone";
+      HttpCodes3[HttpCodes3["TooManyRequests"] = 429] = "TooManyRequests";
+      HttpCodes3[HttpCodes3["InternalServerError"] = 500] = "InternalServerError";
+      HttpCodes3[HttpCodes3["NotImplemented"] = 501] = "NotImplemented";
+      HttpCodes3[HttpCodes3["BadGateway"] = 502] = "BadGateway";
+      HttpCodes3[HttpCodes3["ServiceUnavailable"] = 503] = "ServiceUnavailable";
+      HttpCodes3[HttpCodes3["GatewayTimeout"] = 504] = "GatewayTimeout";
+    })(HttpCodes2 = exports.HttpCodes || (exports.HttpCodes = {}));
     var Headers;
     (function(Headers2) {
       Headers2["Accept"] = "accept";
@@ -542,21 +597,21 @@ var require_http_client = __commonJS({
       MediaTypes2["ApplicationJson"] = "application/json";
     })(MediaTypes = exports.MediaTypes || (exports.MediaTypes = {}));
     function getProxyUrl(serverUrl) {
-      let proxyUrl = pm.getProxyUrl(new URL(serverUrl));
+      const proxyUrl = pm.getProxyUrl(new URL(serverUrl));
       return proxyUrl ? proxyUrl.href : "";
     }
     exports.getProxyUrl = getProxyUrl;
     var HttpRedirectCodes = [
-      HttpCodes.MovedPermanently,
-      HttpCodes.ResourceMoved,
-      HttpCodes.SeeOther,
-      HttpCodes.TemporaryRedirect,
-      HttpCodes.PermanentRedirect
+      HttpCodes2.MovedPermanently,
+      HttpCodes2.ResourceMoved,
+      HttpCodes2.SeeOther,
+      HttpCodes2.TemporaryRedirect,
+      HttpCodes2.PermanentRedirect
     ];
     var HttpResponseRetryCodes = [
-      HttpCodes.BadGateway,
-      HttpCodes.ServiceUnavailable,
-      HttpCodes.GatewayTimeout
+      HttpCodes2.BadGateway,
+      HttpCodes2.ServiceUnavailable,
+      HttpCodes2.GatewayTimeout
     ];
     var RetryableHttpVerbs = ["OPTIONS", "GET", "DELETE", "HEAD"];
     var ExponentialBackoffCeiling = 10;
@@ -575,20 +630,22 @@ var require_http_client = __commonJS({
         this.message = message;
       }
       readBody() {
-        return new Promise(async (resolve, reject) => {
-          let output = Buffer.alloc(0);
-          this.message.on("data", (chunk) => {
-            output = Buffer.concat([output, chunk]);
-          });
-          this.message.on("end", () => {
-            resolve(output.toString());
-          });
+        return __awaiter(this, void 0, void 0, function* () {
+          return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+            let output = Buffer.alloc(0);
+            this.message.on("data", (chunk) => {
+              output = Buffer.concat([output, chunk]);
+            });
+            this.message.on("end", () => {
+              resolve(output.toString());
+            });
+          }));
         });
       }
     };
     exports.HttpClientResponse = HttpClientResponse;
     function isHttps(requestUrl) {
-      let parsedUrl = new URL(requestUrl);
+      const parsedUrl = new URL(requestUrl);
       return parsedUrl.protocol === "https:";
     }
     exports.isHttps = isHttps;
@@ -631,112 +688,138 @@ var require_http_client = __commonJS({
         }
       }
       options(requestUrl, additionalHeaders) {
-        return this.request("OPTIONS", requestUrl, null, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.request("OPTIONS", requestUrl, null, additionalHeaders || {});
+        });
       }
       get(requestUrl, additionalHeaders) {
-        return this.request("GET", requestUrl, null, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.request("GET", requestUrl, null, additionalHeaders || {});
+        });
       }
       del(requestUrl, additionalHeaders) {
-        return this.request("DELETE", requestUrl, null, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.request("DELETE", requestUrl, null, additionalHeaders || {});
+        });
       }
       post(requestUrl, data, additionalHeaders) {
-        return this.request("POST", requestUrl, data, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.request("POST", requestUrl, data, additionalHeaders || {});
+        });
       }
       patch(requestUrl, data, additionalHeaders) {
-        return this.request("PATCH", requestUrl, data, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.request("PATCH", requestUrl, data, additionalHeaders || {});
+        });
       }
       put(requestUrl, data, additionalHeaders) {
-        return this.request("PUT", requestUrl, data, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.request("PUT", requestUrl, data, additionalHeaders || {});
+        });
       }
       head(requestUrl, additionalHeaders) {
-        return this.request("HEAD", requestUrl, null, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.request("HEAD", requestUrl, null, additionalHeaders || {});
+        });
       }
       sendStream(verb, requestUrl, stream, additionalHeaders) {
-        return this.request(verb, requestUrl, stream, additionalHeaders);
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.request(verb, requestUrl, stream, additionalHeaders);
+        });
       }
-      async getJson(requestUrl, additionalHeaders = {}) {
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        let res = await this.get(requestUrl, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
+      getJson(requestUrl, additionalHeaders = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          const res = yield this.get(requestUrl, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
       }
-      async postJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.post(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
+      postJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.post(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
       }
-      async putJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.put(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
+      putJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.put(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
       }
-      async patchJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.patch(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
+      patchJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.patch(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
       }
-      async request(verb, requestUrl, data, headers) {
-        if (this._disposed) {
-          throw new Error("Client has already been disposed.");
-        }
-        let parsedUrl = new URL(requestUrl);
-        let info = this._prepareRequest(verb, parsedUrl, headers);
-        let maxTries = this._allowRetries && RetryableHttpVerbs.indexOf(verb) != -1 ? this._maxRetries + 1 : 1;
-        let numTries = 0;
-        let response;
-        while (numTries < maxTries) {
-          response = await this.requestRaw(info, data);
-          if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
-            let authenticationHandler;
-            for (let i = 0; i < this.handlers.length; i++) {
-              if (this.handlers[i].canHandleAuthentication(response)) {
-                authenticationHandler = this.handlers[i];
-                break;
-              }
-            }
-            if (authenticationHandler) {
-              return authenticationHandler.handleAuthentication(this, info, data);
-            } else {
-              return response;
-            }
+      request(verb, requestUrl, data, headers) {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (this._disposed) {
+            throw new Error("Client has already been disposed.");
           }
-          let redirectsRemaining = this._maxRedirects;
-          while (HttpRedirectCodes.indexOf(response.message.statusCode) != -1 && this._allowRedirects && redirectsRemaining > 0) {
-            const redirectUrl = response.message.headers["location"];
-            if (!redirectUrl) {
-              break;
-            }
-            let parsedRedirectUrl = new URL(redirectUrl);
-            if (parsedUrl.protocol == "https:" && parsedUrl.protocol != parsedRedirectUrl.protocol && !this._allowRedirectDowngrade) {
-              throw new Error("Redirect from HTTPS to HTTP protocol. This downgrade is not allowed for security reasons. If you want to allow this behavior, set the allowRedirectDowngrade option to true.");
-            }
-            await response.readBody();
-            if (parsedRedirectUrl.hostname !== parsedUrl.hostname) {
-              for (let header in headers) {
-                if (header.toLowerCase() === "authorization") {
-                  delete headers[header];
+          const parsedUrl = new URL(requestUrl);
+          let info2 = this._prepareRequest(verb, parsedUrl, headers);
+          const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
+          let numTries = 0;
+          let response;
+          do {
+            response = yield this.requestRaw(info2, data);
+            if (response && response.message && response.message.statusCode === HttpCodes2.Unauthorized) {
+              let authenticationHandler;
+              for (const handler of this.handlers) {
+                if (handler.canHandleAuthentication(response)) {
+                  authenticationHandler = handler;
+                  break;
                 }
               }
+              if (authenticationHandler) {
+                return authenticationHandler.handleAuthentication(this, info2, data);
+              } else {
+                return response;
+              }
             }
-            info = this._prepareRequest(verb, parsedRedirectUrl, headers);
-            response = await this.requestRaw(info, data);
-            redirectsRemaining--;
-          }
-          if (HttpResponseRetryCodes.indexOf(response.message.statusCode) == -1) {
-            return response;
-          }
-          numTries += 1;
-          if (numTries < maxTries) {
-            await response.readBody();
-            await this._performExponentialBackoff(numTries);
-          }
-        }
-        return response;
+            let redirectsRemaining = this._maxRedirects;
+            while (response.message.statusCode && HttpRedirectCodes.includes(response.message.statusCode) && this._allowRedirects && redirectsRemaining > 0) {
+              const redirectUrl = response.message.headers["location"];
+              if (!redirectUrl) {
+                break;
+              }
+              const parsedRedirectUrl = new URL(redirectUrl);
+              if (parsedUrl.protocol === "https:" && parsedUrl.protocol !== parsedRedirectUrl.protocol && !this._allowRedirectDowngrade) {
+                throw new Error("Redirect from HTTPS to HTTP protocol. This downgrade is not allowed for security reasons. If you want to allow this behavior, set the allowRedirectDowngrade option to true.");
+              }
+              yield response.readBody();
+              if (parsedRedirectUrl.hostname !== parsedUrl.hostname) {
+                for (const header in headers) {
+                  if (header.toLowerCase() === "authorization") {
+                    delete headers[header];
+                  }
+                }
+              }
+              info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info2, data);
+              redirectsRemaining--;
+            }
+            if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
+              return response;
+            }
+            numTries += 1;
+            if (numTries < maxTries) {
+              yield response.readBody();
+              yield this._performExponentialBackoff(numTries);
+            }
+          } while (numTries < maxTries);
+          return response;
+        });
       }
       dispose() {
         if (this._agent) {
@@ -744,33 +827,41 @@ var require_http_client = __commonJS({
         }
         this._disposed = true;
       }
-      requestRaw(info, data) {
-        return new Promise((resolve, reject) => {
-          let callbackForResult = function(err, res) {
-            if (err) {
-              reject(err);
+      requestRaw(info2, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+          return new Promise((resolve, reject) => {
+            function callbackForResult(err, res) {
+              if (err) {
+                reject(err);
+              } else if (!res) {
+                reject(new Error("Unknown error"));
+              } else {
+                resolve(res);
+              }
             }
-            resolve(res);
-          };
-          this.requestRawWithCallback(info, data, callbackForResult);
+            this.requestRawWithCallback(info2, data, callbackForResult);
+          });
         });
       }
-      requestRawWithCallback(info, data, onResult) {
-        let socket;
+      requestRawWithCallback(info2, data, onResult) {
         if (typeof data === "string") {
-          info.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          if (!info2.options.headers) {
+            info2.options.headers = {};
+          }
+          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
-        let handleResult = (err, res) => {
+        function handleResult(err, res) {
           if (!callbackCalled) {
             callbackCalled = true;
             onResult(err, res);
           }
-        };
-        let req = info.httpModule.request(info.options, (msg) => {
-          let res = new HttpClientResponse(msg);
-          handleResult(null, res);
+        }
+        const req = info2.httpModule.request(info2.options, (msg) => {
+          const res = new HttpClientResponse(msg);
+          handleResult(void 0, res);
         });
+        let socket;
         req.on("socket", (sock) => {
           socket = sock;
         });
@@ -778,10 +869,10 @@ var require_http_client = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult(new Error("Request timeout: " + info.options.path), null);
+          handleResult(new Error(`Request timeout: ${info2.options.path}`));
         });
         req.on("error", function(err) {
-          handleResult(err, null);
+          handleResult(err);
         });
         if (data && typeof data === "string") {
           req.write(data, "utf8");
@@ -796,41 +887,39 @@ var require_http_client = __commonJS({
         }
       }
       getAgent(serverUrl) {
-        let parsedUrl = new URL(serverUrl);
+        const parsedUrl = new URL(serverUrl);
         return this._getAgent(parsedUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info = {};
-        info.parsedUrl = requestUrl;
-        const usingSsl = info.parsedUrl.protocol === "https:";
-        info.httpModule = usingSsl ? https : http;
+        const info2 = {};
+        info2.parsedUrl = requestUrl;
+        const usingSsl = info2.parsedUrl.protocol === "https:";
+        info2.httpModule = usingSsl ? https : http;
         const defaultPort = usingSsl ? 443 : 80;
-        info.options = {};
-        info.options.host = info.parsedUrl.hostname;
-        info.options.port = info.parsedUrl.port ? parseInt(info.parsedUrl.port) : defaultPort;
-        info.options.path = (info.parsedUrl.pathname || "") + (info.parsedUrl.search || "");
-        info.options.method = method;
-        info.options.headers = this._mergeHeaders(headers);
+        info2.options = {};
+        info2.options.host = info2.parsedUrl.hostname;
+        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
+        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
+        info2.options.method = method;
+        info2.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info.options.headers["user-agent"] = this.userAgent;
+          info2.options.headers["user-agent"] = this.userAgent;
         }
-        info.options.agent = this._getAgent(info.parsedUrl);
+        info2.options.agent = this._getAgent(info2.parsedUrl);
         if (this.handlers) {
-          this.handlers.forEach((handler) => {
-            handler.prepareRequest(info.options);
-          });
+          for (const handler of this.handlers) {
+            handler.prepareRequest(info2.options);
+          }
         }
-        return info;
+        return info2;
       }
       _mergeHeaders(headers) {
-        const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => (c[k.toLowerCase()] = obj[k], c), {});
         if (this.requestOptions && this.requestOptions.headers) {
-          return Object.assign({}, lowercaseKeys(this.requestOptions.headers), lowercaseKeys(headers));
+          return Object.assign({}, lowercaseKeys(this.requestOptions.headers), lowercaseKeys(headers || {}));
         }
         return lowercaseKeys(headers || {});
       }
       _getExistingOrDefaultHeader(additionalHeaders, header, _default) {
-        const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => (c[k.toLowerCase()] = obj[k], c), {});
         let clientHeader;
         if (this.requestOptions && this.requestOptions.headers) {
           clientHeader = lowercaseKeys(this.requestOptions.headers)[header];
@@ -839,35 +928,29 @@ var require_http_client = __commonJS({
       }
       _getAgent(parsedUrl) {
         let agent;
-        let proxyUrl = pm.getProxyUrl(parsedUrl);
-        let useProxy = proxyUrl && proxyUrl.hostname;
+        const proxyUrl = pm.getProxyUrl(parsedUrl);
+        const useProxy = proxyUrl && proxyUrl.hostname;
         if (this._keepAlive && useProxy) {
           agent = this._proxyAgent;
         }
         if (this._keepAlive && !useProxy) {
           agent = this._agent;
         }
-        if (!!agent) {
+        if (agent) {
           return agent;
         }
         const usingSsl = parsedUrl.protocol === "https:";
         let maxSockets = 100;
-        if (!!this.requestOptions) {
+        if (this.requestOptions) {
           maxSockets = this.requestOptions.maxSockets || http.globalAgent.maxSockets;
         }
-        if (useProxy) {
-          if (!tunnel) {
-            tunnel = require_tunnel2();
-          }
+        if (proxyUrl && proxyUrl.hostname) {
           const agentOptions = {
             maxSockets,
             keepAlive: this._keepAlive,
-            proxy: __spreadProps(__spreadValues({}, (proxyUrl.username || proxyUrl.password) && {
+            proxy: Object.assign(Object.assign({}, (proxyUrl.username || proxyUrl.password) && {
               proxyAuth: `${proxyUrl.username}:${proxyUrl.password}`
-            }), {
-              host: proxyUrl.hostname,
-              port: proxyUrl.port
-            })
+            }), { host: proxyUrl.hostname, port: proxyUrl.port })
           };
           let tunnelAgent;
           const overHttps = proxyUrl.protocol === "https:";
@@ -895,85 +978,123 @@ var require_http_client = __commonJS({
         return agent;
       }
       _performExponentialBackoff(retryNumber) {
-        retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
-        const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
-        return new Promise((resolve) => setTimeout(() => resolve(), ms));
+        return __awaiter(this, void 0, void 0, function* () {
+          retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
+          const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
+          return new Promise((resolve) => setTimeout(() => resolve(), ms));
+        });
       }
-      static dateTimeDeserializer(key, value) {
-        if (typeof value === "string") {
-          let a = new Date(value);
-          if (!isNaN(a.valueOf())) {
-            return a;
-          }
-        }
-        return value;
-      }
-      async _processResponse(res, options) {
-        return new Promise(async (resolve, reject) => {
-          const statusCode = res.message.statusCode;
-          const response = {
-            statusCode,
-            result: null,
-            headers: {}
-          };
-          if (statusCode == HttpCodes.NotFound) {
-            resolve(response);
-          }
-          let obj;
-          let contents;
-          try {
-            contents = await res.readBody();
-            if (contents && contents.length > 0) {
-              if (options && options.deserializeDates) {
-                obj = JSON.parse(contents, HttpClient2.dateTimeDeserializer);
-              } else {
-                obj = JSON.parse(contents);
+      _processResponse(res, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+          return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+            const statusCode = res.message.statusCode || 0;
+            const response = {
+              statusCode,
+              result: null,
+              headers: {}
+            };
+            if (statusCode === HttpCodes2.NotFound) {
+              resolve(response);
+            }
+            function dateTimeDeserializer(key, value) {
+              if (typeof value === "string") {
+                const a = new Date(value);
+                if (!isNaN(a.valueOf())) {
+                  return a;
+                }
               }
-              response.result = obj;
+              return value;
             }
-            response.headers = res.message.headers;
-          } catch (err) {
-          }
-          if (statusCode > 299) {
-            let msg;
-            if (obj && obj.message) {
-              msg = obj.message;
-            } else if (contents && contents.length > 0) {
-              msg = contents;
+            let obj;
+            let contents;
+            try {
+              contents = yield res.readBody();
+              if (contents && contents.length > 0) {
+                if (options && options.deserializeDates) {
+                  obj = JSON.parse(contents, dateTimeDeserializer);
+                } else {
+                  obj = JSON.parse(contents);
+                }
+                response.result = obj;
+              }
+              response.headers = res.message.headers;
+            } catch (err) {
+            }
+            if (statusCode > 299) {
+              let msg;
+              if (obj && obj.message) {
+                msg = obj.message;
+              } else if (contents && contents.length > 0) {
+                msg = contents;
+              } else {
+                msg = `Failed request: (${statusCode})`;
+              }
+              const err = new HttpClientError(msg, statusCode);
+              err.result = response.result;
+              reject(err);
             } else {
-              msg = "Failed request: (" + statusCode + ")";
+              resolve(response);
             }
-            let err = new HttpClientError(msg, statusCode);
-            err.result = response.result;
-            reject(err);
-          } else {
-            resolve(response);
-          }
+          }));
         });
       }
     };
     exports.HttpClient = HttpClient2;
+    var lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => (c[k.toLowerCase()] = obj[k], c), {});
   }
 });
 
-// node_modules/@actions/http-client/auth.js
+// node_modules/@actions/http-client/lib/auth.js
 var require_auth = __commonJS({
-  "node_modules/@actions/http-client/auth.js"(exports) {
+  "node_modules/@actions/http-client/lib/auth.js"(exports) {
     "use strict";
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PersonalAccessTokenCredentialHandler = exports.BearerCredentialHandler = exports.BasicCredentialHandler = void 0;
     var BasicCredentialHandler = class {
       constructor(username, password) {
         this.username = username;
         this.password = password;
       }
       prepareRequest(options) {
-        options.headers["Authorization"] = "Basic " + Buffer.from(this.username + ":" + this.password).toString("base64");
+        if (!options.headers) {
+          throw Error("The request has no headers");
+        }
+        options.headers["Authorization"] = `Basic ${Buffer.from(`${this.username}:${this.password}`).toString("base64")}`;
       }
-      canHandleAuthentication(response) {
+      canHandleAuthentication() {
         return false;
       }
-      handleAuthentication(httpClient2, requestInfo, objs) {
-        return null;
+      handleAuthentication() {
+        return __awaiter(this, void 0, void 0, function* () {
+          throw new Error("not implemented");
+        });
       }
     };
     exports.BasicCredentialHandler = BasicCredentialHandler;
@@ -982,13 +1103,18 @@ var require_auth = __commonJS({
         this.token = token;
       }
       prepareRequest(options) {
-        options.headers["Authorization"] = "Bearer " + this.token;
+        if (!options.headers) {
+          throw Error("The request has no headers");
+        }
+        options.headers["Authorization"] = `Bearer ${this.token}`;
       }
-      canHandleAuthentication(response) {
+      canHandleAuthentication() {
         return false;
       }
-      handleAuthentication(httpClient2, requestInfo, objs) {
-        return null;
+      handleAuthentication() {
+        return __awaiter(this, void 0, void 0, function* () {
+          throw new Error("not implemented");
+        });
       }
     };
     exports.BearerCredentialHandler = BearerCredentialHandler;
@@ -997,13 +1123,18 @@ var require_auth = __commonJS({
         this.token = token;
       }
       prepareRequest(options) {
-        options.headers["Authorization"] = "Basic " + Buffer.from("PAT:" + this.token).toString("base64");
+        if (!options.headers) {
+          throw Error("The request has no headers");
+        }
+        options.headers["Authorization"] = `Basic ${Buffer.from(`PAT:${this.token}`).toString("base64")}`;
       }
-      canHandleAuthentication(response) {
+      canHandleAuthentication() {
         return false;
       }
-      handleAuthentication(httpClient2, requestInfo, objs) {
-        return null;
+      handleAuthentication() {
+        return __awaiter(this, void 0, void 0, function* () {
+          throw new Error("not implemented");
+        });
       }
     };
     exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHandler;
@@ -1043,7 +1174,7 @@ var require_oidc_utils = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.OidcClient = void 0;
-    var http_client_1 = require_http_client();
+    var http_client_1 = require_lib();
     var auth_1 = require_auth();
     var core_1 = require_core();
     var OidcClient = class {
@@ -1105,6 +1236,171 @@ var require_oidc_utils = __commonJS({
       }
     };
     exports.OidcClient = OidcClient;
+  }
+});
+
+// node_modules/@actions/core/lib/summary.js
+var require_summary = __commonJS({
+  "node_modules/@actions/core/lib/summary.js"(exports) {
+    "use strict";
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.summary = exports.markdownSummary = exports.SUMMARY_DOCS_URL = exports.SUMMARY_ENV_VAR = void 0;
+    var os_1 = require("os");
+    var fs_1 = require("fs");
+    var { access, appendFile, writeFile } = fs_1.promises;
+    exports.SUMMARY_ENV_VAR = "GITHUB_STEP_SUMMARY";
+    exports.SUMMARY_DOCS_URL = "https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary";
+    var Summary = class {
+      constructor() {
+        this._buffer = "";
+      }
+      filePath() {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (this._filePath) {
+            return this._filePath;
+          }
+          const pathFromEnv = process.env[exports.SUMMARY_ENV_VAR];
+          if (!pathFromEnv) {
+            throw new Error(`Unable to find environment variable for $${exports.SUMMARY_ENV_VAR}. Check if your runtime environment supports job summaries.`);
+          }
+          try {
+            yield access(pathFromEnv, fs_1.constants.R_OK | fs_1.constants.W_OK);
+          } catch (_a) {
+            throw new Error(`Unable to access summary file: '${pathFromEnv}'. Check if the file has correct read/write permissions.`);
+          }
+          this._filePath = pathFromEnv;
+          return this._filePath;
+        });
+      }
+      wrap(tag, content, attrs = {}) {
+        const htmlAttrs = Object.entries(attrs).map(([key, value]) => ` ${key}="${value}"`).join("");
+        if (!content) {
+          return `<${tag}${htmlAttrs}>`;
+        }
+        return `<${tag}${htmlAttrs}>${content}</${tag}>`;
+      }
+      write(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+          const overwrite = !!(options === null || options === void 0 ? void 0 : options.overwrite);
+          const filePath = yield this.filePath();
+          const writeFunc = overwrite ? writeFile : appendFile;
+          yield writeFunc(filePath, this._buffer, { encoding: "utf8" });
+          return this.emptyBuffer();
+        });
+      }
+      clear() {
+        return __awaiter(this, void 0, void 0, function* () {
+          return this.emptyBuffer().write({ overwrite: true });
+        });
+      }
+      stringify() {
+        return this._buffer;
+      }
+      isEmptyBuffer() {
+        return this._buffer.length === 0;
+      }
+      emptyBuffer() {
+        this._buffer = "";
+        return this;
+      }
+      addRaw(text, addEOL = false) {
+        this._buffer += text;
+        return addEOL ? this.addEOL() : this;
+      }
+      addEOL() {
+        return this.addRaw(os_1.EOL);
+      }
+      addCodeBlock(code, lang) {
+        const attrs = Object.assign({}, lang && { lang });
+        const element = this.wrap("pre", this.wrap("code", code), attrs);
+        return this.addRaw(element).addEOL();
+      }
+      addList(items, ordered = false) {
+        const tag = ordered ? "ol" : "ul";
+        const listItems = items.map((item) => this.wrap("li", item)).join("");
+        const element = this.wrap(tag, listItems);
+        return this.addRaw(element).addEOL();
+      }
+      addTable(rows) {
+        const tableBody = rows.map((row) => {
+          const cells = row.map((cell) => {
+            if (typeof cell === "string") {
+              return this.wrap("td", cell);
+            }
+            const { header, data, colspan, rowspan } = cell;
+            const tag = header ? "th" : "td";
+            const attrs = Object.assign(Object.assign({}, colspan && { colspan }), rowspan && { rowspan });
+            return this.wrap(tag, data, attrs);
+          }).join("");
+          return this.wrap("tr", cells);
+        }).join("");
+        const element = this.wrap("table", tableBody);
+        return this.addRaw(element).addEOL();
+      }
+      addDetails(label, content) {
+        const element = this.wrap("details", this.wrap("summary", label) + content);
+        return this.addRaw(element).addEOL();
+      }
+      addImage(src, alt, options) {
+        const { width, height } = options || {};
+        const attrs = Object.assign(Object.assign({}, width && { width }), height && { height });
+        const element = this.wrap("img", null, Object.assign({ src, alt }, attrs));
+        return this.addRaw(element).addEOL();
+      }
+      addHeading(text, level) {
+        const tag = `h${level}`;
+        const allowedTag = ["h1", "h2", "h3", "h4", "h5", "h6"].includes(tag) ? tag : "h1";
+        const element = this.wrap(allowedTag, text);
+        return this.addRaw(element).addEOL();
+      }
+      addSeparator() {
+        const element = this.wrap("hr", null);
+        return this.addRaw(element).addEOL();
+      }
+      addBreak() {
+        const element = this.wrap("br", null);
+        return this.addRaw(element).addEOL();
+      }
+      addQuote(text, cite) {
+        const attrs = Object.assign({}, cite && { cite });
+        const element = this.wrap("blockquote", text, attrs);
+        return this.addRaw(element).addEOL();
+      }
+      addLink(text, href) {
+        const element = this.wrap("a", text, { href });
+        return this.addRaw(element).addEOL();
+      }
+    };
+    var _summary = new Summary();
+    exports.markdownSummary = _summary;
+    exports.summary = _summary;
   }
 });
 
@@ -1269,10 +1565,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("notice", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
     exports.notice = notice;
-    function info(message) {
+    function info2(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports.info = info;
+    exports.info = info2;
     function startGroup(name) {
       command_1.issue("group", name);
     }
@@ -1308,6 +1604,14 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       });
     }
     exports.getIDToken = getIDToken;
+    var summary_1 = require_summary();
+    Object.defineProperty(exports, "summary", { enumerable: true, get: function() {
+      return summary_1.summary;
+    } });
+    var summary_2 = require_summary();
+    Object.defineProperty(exports, "markdownSummary", { enumerable: true, get: function() {
+      return summary_2.markdownSummary;
+    } });
   }
 });
 
@@ -1772,7 +2076,7 @@ var require_io = __commonJS({
 // node_modules/@actions/tool-cache/node_modules/semver/semver.js
 var require_semver = __commonJS({
   "node_modules/@actions/tool-cache/node_modules/semver/semver.js"(exports, module2) {
-    exports = module2.exports = SemVer2;
+    exports = module2.exports = SemVer3;
     var debug;
     if (typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG)) {
       debug = function() {
@@ -1885,73 +2189,73 @@ var require_semver = __commonJS({
     }
     var i;
     exports.parse = parse;
-    function parse(version, options) {
+    function parse(version2, options) {
       if (!options || typeof options !== "object") {
         options = {
           loose: !!options,
           includePrerelease: false
         };
       }
-      if (version instanceof SemVer2) {
-        return version;
+      if (version2 instanceof SemVer3) {
+        return version2;
       }
-      if (typeof version !== "string") {
+      if (typeof version2 !== "string") {
         return null;
       }
-      if (version.length > MAX_LENGTH) {
+      if (version2.length > MAX_LENGTH) {
         return null;
       }
       var r = options.loose ? re[t.LOOSE] : re[t.FULL];
-      if (!r.test(version)) {
+      if (!r.test(version2)) {
         return null;
       }
       try {
-        return new SemVer2(version, options);
+        return new SemVer3(version2, options);
       } catch (er) {
         return null;
       }
     }
     exports.valid = valid;
-    function valid(version, options) {
-      var v = parse(version, options);
+    function valid(version2, options) {
+      var v = parse(version2, options);
       return v ? v.version : null;
     }
     exports.clean = clean;
-    function clean(version, options) {
-      var s = parse(version.trim().replace(/^[=v]+/, ""), options);
+    function clean(version2, options) {
+      var s = parse(version2.trim().replace(/^[=v]+/, ""), options);
       return s ? s.version : null;
     }
-    exports.SemVer = SemVer2;
-    function SemVer2(version, options) {
+    exports.SemVer = SemVer3;
+    function SemVer3(version2, options) {
       if (!options || typeof options !== "object") {
         options = {
           loose: !!options,
           includePrerelease: false
         };
       }
-      if (version instanceof SemVer2) {
-        if (version.loose === options.loose) {
-          return version;
+      if (version2 instanceof SemVer3) {
+        if (version2.loose === options.loose) {
+          return version2;
         } else {
-          version = version.version;
+          version2 = version2.version;
         }
-      } else if (typeof version !== "string") {
-        throw new TypeError("Invalid Version: " + version);
+      } else if (typeof version2 !== "string") {
+        throw new TypeError("Invalid Version: " + version2);
       }
-      if (version.length > MAX_LENGTH) {
+      if (version2.length > MAX_LENGTH) {
         throw new TypeError("version is longer than " + MAX_LENGTH + " characters");
       }
-      if (!(this instanceof SemVer2)) {
-        return new SemVer2(version, options);
+      if (!(this instanceof SemVer3)) {
+        return new SemVer3(version2, options);
       }
-      debug("SemVer", version, options);
+      debug("SemVer", version2, options);
       this.options = options;
       this.loose = !!options.loose;
-      var m = version.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
+      var m = version2.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
       if (!m) {
-        throw new TypeError("Invalid Version: " + version);
+        throw new TypeError("Invalid Version: " + version2);
       }
-      this.raw = version;
+      this.raw = version2;
       this.major = +m[1];
       this.minor = +m[2];
       this.patch = +m[3];
@@ -1980,32 +2284,32 @@ var require_semver = __commonJS({
       this.build = m[5] ? m[5].split(".") : [];
       this.format();
     }
-    SemVer2.prototype.format = function() {
+    SemVer3.prototype.format = function() {
       this.version = this.major + "." + this.minor + "." + this.patch;
       if (this.prerelease.length) {
         this.version += "-" + this.prerelease.join(".");
       }
       return this.version;
     };
-    SemVer2.prototype.toString = function() {
+    SemVer3.prototype.toString = function() {
       return this.version;
     };
-    SemVer2.prototype.compare = function(other) {
+    SemVer3.prototype.compare = function(other) {
       debug("SemVer.compare", this.version, this.options, other);
-      if (!(other instanceof SemVer2)) {
-        other = new SemVer2(other, this.options);
+      if (!(other instanceof SemVer3)) {
+        other = new SemVer3(other, this.options);
       }
       return this.compareMain(other) || this.comparePre(other);
     };
-    SemVer2.prototype.compareMain = function(other) {
-      if (!(other instanceof SemVer2)) {
-        other = new SemVer2(other, this.options);
+    SemVer3.prototype.compareMain = function(other) {
+      if (!(other instanceof SemVer3)) {
+        other = new SemVer3(other, this.options);
       }
       return compareIdentifiers(this.major, other.major) || compareIdentifiers(this.minor, other.minor) || compareIdentifiers(this.patch, other.patch);
     };
-    SemVer2.prototype.comparePre = function(other) {
-      if (!(other instanceof SemVer2)) {
-        other = new SemVer2(other, this.options);
+    SemVer3.prototype.comparePre = function(other) {
+      if (!(other instanceof SemVer3)) {
+        other = new SemVer3(other, this.options);
       }
       if (this.prerelease.length && !other.prerelease.length) {
         return -1;
@@ -2032,9 +2336,9 @@ var require_semver = __commonJS({
         }
       } while (++i2);
     };
-    SemVer2.prototype.compareBuild = function(other) {
-      if (!(other instanceof SemVer2)) {
-        other = new SemVer2(other, this.options);
+    SemVer3.prototype.compareBuild = function(other) {
+      if (!(other instanceof SemVer3)) {
+        other = new SemVer3(other, this.options);
       }
       var i2 = 0;
       do {
@@ -2054,7 +2358,7 @@ var require_semver = __commonJS({
         }
       } while (++i2);
     };
-    SemVer2.prototype.inc = function(release, identifier) {
+    SemVer3.prototype.inc = function(release, identifier) {
       switch (release) {
         case "premajor":
           this.prerelease.length = 0;
@@ -2134,13 +2438,13 @@ var require_semver = __commonJS({
       return this;
     };
     exports.inc = inc;
-    function inc(version, release, loose, identifier) {
+    function inc(version2, release, loose, identifier) {
       if (typeof loose === "string") {
         identifier = loose;
         loose = void 0;
       }
       try {
-        return new SemVer2(version, loose).inc(release, identifier).version;
+        return new SemVer3(version2, loose).inc(release, identifier).version;
       } catch (er) {
         return null;
       }
@@ -2184,19 +2488,19 @@ var require_semver = __commonJS({
     }
     exports.major = major;
     function major(a, loose) {
-      return new SemVer2(a, loose).major;
+      return new SemVer3(a, loose).major;
     }
     exports.minor = minor;
     function minor(a, loose) {
-      return new SemVer2(a, loose).minor;
+      return new SemVer3(a, loose).minor;
     }
     exports.patch = patch;
     function patch(a, loose) {
-      return new SemVer2(a, loose).patch;
+      return new SemVer3(a, loose).patch;
     }
     exports.compare = compare;
     function compare(a, b, loose) {
-      return new SemVer2(a, loose).compare(new SemVer2(b, loose));
+      return new SemVer3(a, loose).compare(new SemVer3(b, loose));
     }
     exports.compareLoose = compareLoose;
     function compareLoose(a, b) {
@@ -2204,8 +2508,8 @@ var require_semver = __commonJS({
     }
     exports.compareBuild = compareBuild;
     function compareBuild(a, b, loose) {
-      var versionA = new SemVer2(a, loose);
-      var versionB = new SemVer2(b, loose);
+      var versionA = new SemVer3(a, loose);
+      var versionB = new SemVer3(b, loose);
       return versionA.compare(versionB) || versionA.compareBuild(versionB);
     }
     exports.rcompare = rcompare;
@@ -2324,25 +2628,25 @@ var require_semver = __commonJS({
       if (!m[2]) {
         this.semver = ANY;
       } else {
-        this.semver = new SemVer2(m[2], this.options.loose);
+        this.semver = new SemVer3(m[2], this.options.loose);
       }
     };
     Comparator.prototype.toString = function() {
       return this.value;
     };
-    Comparator.prototype.test = function(version) {
-      debug("Comparator.test", version, this.options.loose);
-      if (this.semver === ANY || version === ANY) {
+    Comparator.prototype.test = function(version2) {
+      debug("Comparator.test", version2, this.options.loose);
+      if (this.semver === ANY || version2 === ANY) {
         return true;
       }
-      if (typeof version === "string") {
+      if (typeof version2 === "string") {
         try {
-          version = new SemVer2(version, this.options);
+          version2 = new SemVer3(version2, this.options);
         } catch (er) {
           return false;
         }
       }
-      return cmp(version, this.operator, this.semver, this.options);
+      return cmp(version2, this.operator, this.semver, this.options);
     };
     Comparator.prototype.intersects = function(comp, options) {
       if (!(comp instanceof Comparator)) {
@@ -2653,31 +2957,31 @@ var require_semver = __commonJS({
       }
       return (from + " " + to).trim();
     }
-    Range2.prototype.test = function(version) {
-      if (!version) {
+    Range2.prototype.test = function(version2) {
+      if (!version2) {
         return false;
       }
-      if (typeof version === "string") {
+      if (typeof version2 === "string") {
         try {
-          version = new SemVer2(version, this.options);
+          version2 = new SemVer3(version2, this.options);
         } catch (er) {
           return false;
         }
       }
       for (var i2 = 0; i2 < this.set.length; i2++) {
-        if (testSet(this.set[i2], version, this.options)) {
+        if (testSet(this.set[i2], version2, this.options)) {
           return true;
         }
       }
       return false;
     };
-    function testSet(set, version, options) {
+    function testSet(set, version2, options) {
       for (var i2 = 0; i2 < set.length; i2++) {
-        if (!set[i2].test(version)) {
+        if (!set[i2].test(version2)) {
           return false;
         }
       }
-      if (version.prerelease.length && !options.includePrerelease) {
+      if (version2.prerelease.length && !options.includePrerelease) {
         for (i2 = 0; i2 < set.length; i2++) {
           debug(set[i2].semver);
           if (set[i2].semver === ANY) {
@@ -2685,7 +2989,7 @@ var require_semver = __commonJS({
           }
           if (set[i2].semver.prerelease.length > 0) {
             var allowed = set[i2].semver;
-            if (allowed.major === version.major && allowed.minor === version.minor && allowed.patch === version.patch) {
+            if (allowed.major === version2.major && allowed.minor === version2.minor && allowed.patch === version2.patch) {
               return true;
             }
           }
@@ -2695,13 +2999,13 @@ var require_semver = __commonJS({
       return true;
     }
     exports.satisfies = satisfies;
-    function satisfies(version, range, options) {
+    function satisfies(version2, range, options) {
       try {
         range = new Range2(range, options);
       } catch (er) {
         return false;
       }
-      return range.test(version);
+      return range.test(version2);
     }
     exports.maxSatisfying = maxSatisfying;
     function maxSatisfying(versions, range, options) {
@@ -2716,7 +3020,7 @@ var require_semver = __commonJS({
         if (rangeObj.test(v)) {
           if (!max || maxSV.compare(v) === -1) {
             max = v;
-            maxSV = new SemVer2(max, options);
+            maxSV = new SemVer3(max, options);
           }
         }
       });
@@ -2735,7 +3039,7 @@ var require_semver = __commonJS({
         if (rangeObj.test(v)) {
           if (!min || minSV.compare(v) === 1) {
             min = v;
-            minSV = new SemVer2(min, options);
+            minSV = new SemVer3(min, options);
           }
         }
       });
@@ -2744,11 +3048,11 @@ var require_semver = __commonJS({
     exports.minVersion = minVersion;
     function minVersion(range, loose) {
       range = new Range2(range, loose);
-      var minver = new SemVer2("0.0.0");
+      var minver = new SemVer3("0.0.0");
       if (range.test(minver)) {
         return minver;
       }
-      minver = new SemVer2("0.0.0-0");
+      minver = new SemVer3("0.0.0-0");
       if (range.test(minver)) {
         return minver;
       }
@@ -2756,7 +3060,7 @@ var require_semver = __commonJS({
       for (var i2 = 0; i2 < range.set.length; ++i2) {
         var comparators = range.set[i2];
         comparators.forEach(function(comparator) {
-          var compver = new SemVer2(comparator.semver.version);
+          var compver = new SemVer3(comparator.semver.version);
           switch (comparator.operator) {
             case ">":
               if (compver.prerelease.length === 0) {
@@ -2793,16 +3097,16 @@ var require_semver = __commonJS({
       }
     }
     exports.ltr = ltr;
-    function ltr(version, range, options) {
-      return outside(version, range, "<", options);
+    function ltr(version2, range, options) {
+      return outside(version2, range, "<", options);
     }
     exports.gtr = gtr;
-    function gtr(version, range, options) {
-      return outside(version, range, ">", options);
+    function gtr(version2, range, options) {
+      return outside(version2, range, ">", options);
     }
     exports.outside = outside;
-    function outside(version, range, hilo, options) {
-      version = new SemVer2(version, options);
+    function outside(version2, range, hilo, options) {
+      version2 = new SemVer3(version2, options);
       range = new Range2(range, options);
       var gtfn, ltefn, ltfn, comp, ecomp;
       switch (hilo) {
@@ -2823,7 +3127,7 @@ var require_semver = __commonJS({
         default:
           throw new TypeError('Must provide a hilo val of "<" or ">"');
       }
-      if (satisfies(version, range, options)) {
+      if (satisfies(version2, range, options)) {
         return false;
       }
       for (var i2 = 0; i2 < range.set.length; ++i2) {
@@ -2845,17 +3149,17 @@ var require_semver = __commonJS({
         if (high.operator === comp || high.operator === ecomp) {
           return false;
         }
-        if ((!low.operator || low.operator === comp) && ltefn(version, low.semver)) {
+        if ((!low.operator || low.operator === comp) && ltefn(version2, low.semver)) {
           return false;
-        } else if (low.operator === ecomp && ltfn(version, low.semver)) {
+        } else if (low.operator === ecomp && ltfn(version2, low.semver)) {
           return false;
         }
       }
       return true;
     }
     exports.prerelease = prerelease;
-    function prerelease(version, options) {
-      var parsed = parse(version, options);
+    function prerelease(version2, options) {
+      var parsed = parse(version2, options);
       return parsed && parsed.prerelease.length ? parsed.prerelease : null;
     }
     exports.intersects = intersects;
@@ -2865,23 +3169,23 @@ var require_semver = __commonJS({
       return r1.intersects(r2);
     }
     exports.coerce = coerce;
-    function coerce(version, options) {
-      if (version instanceof SemVer2) {
-        return version;
+    function coerce(version2, options) {
+      if (version2 instanceof SemVer3) {
+        return version2;
       }
-      if (typeof version === "number") {
-        version = String(version);
+      if (typeof version2 === "number") {
+        version2 = String(version2);
       }
-      if (typeof version !== "string") {
+      if (typeof version2 !== "string") {
         return null;
       }
       options = options || {};
       var match = null;
       if (!options.rtl) {
-        match = version.match(re[t.COERCE]);
+        match = version2.match(re[t.COERCE]);
       } else {
         var next;
-        while ((next = re[t.COERCERTL].exec(version)) && (!match || match.index + match[0].length !== version.length)) {
+        while ((next = re[t.COERCERTL].exec(version2)) && (!match || match.index + match[0].length !== version2.length)) {
           if (!match || next.index + next[0].length !== match.index + match[0].length) {
             match = next;
           }
@@ -2970,9 +3274,9 @@ var require_manifest = __commonJS({
         let match;
         let file;
         for (const candidate of candidates) {
-          const version = candidate.version;
-          core_1.debug(`check ${version} satisfies ${versionSpec}`);
-          if (semver.satisfies(version, versionSpec) && (!stable || candidate.stable === stable)) {
+          const version2 = candidate.version;
+          core_1.debug(`check ${version2} satisfies ${versionSpec}`);
+          if (semver.satisfies(version2, versionSpec) && (!stable || candidate.stable === stable)) {
             file = candidate.files.find((item) => {
               core_1.debug(`${item.arch}===${archFilter} && ${item.platform}===${platFilter}`);
               let chk = item.arch === archFilter && item.platform === platFilter;
@@ -3003,9 +3307,9 @@ var require_manifest = __commonJS({
     exports._findMatch = _findMatch;
     function _getOsVersion() {
       const plat = os.platform();
-      let version = "";
+      let version2 = "";
       if (plat === "darwin") {
-        version = cp2.execSync("sw_vers -productVersion").toString();
+        version2 = cp2.execSync("sw_vers -productVersion").toString();
       } else if (plat === "linux") {
         const lsbContents = module2.exports._readLinuxVersionFile();
         if (lsbContents) {
@@ -3013,13 +3317,13 @@ var require_manifest = __commonJS({
           for (const line of lines) {
             const parts = line.split("=");
             if (parts.length === 2 && (parts[0].trim() === "VERSION_ID" || parts[0].trim() === "DISTRIB_RELEASE")) {
-              version = parts[1].trim().replace(/^"/, "").replace(/"$/, "");
+              version2 = parts[1].trim().replace(/^"/, "").replace(/"$/, "");
               break;
             }
           }
         }
       }
-      return version;
+      return version2;
     }
     exports._getOsVersion = _getOsVersion;
     function _readLinuxVersionFile() {
@@ -3764,7 +4068,7 @@ var require_retry_helper = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RetryHelper = void 0;
-    var core2 = __importStar(require_core());
+    var core3 = __importStar(require_core());
     var RetryHelper = class {
       constructor(maxAttempts, minSeconds, maxSeconds) {
         if (maxAttempts < 1) {
@@ -3787,10 +4091,10 @@ var require_retry_helper = __commonJS({
               if (isRetryable && !isRetryable(err)) {
                 throw err;
               }
-              core2.info(err.message);
+              core3.info(err.message);
             }
             const seconds = this.getSleepAmount();
-            core2.info(`Waiting ${seconds} seconds before trying again`);
+            core3.info(`Waiting ${seconds} seconds before trying again`);
             yield this.sleep(seconds);
             attempt++;
           }
@@ -3874,19 +4178,19 @@ var require_tool_cache = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.evaluateVersions = exports.isExplicitVersion = exports.findFromManifest = exports.getManifestFromRepo = exports.findAllVersions = exports.find = exports.cacheFile = exports.cacheDir = exports.extractZip = exports.extractXar = exports.extractTar = exports.extract7z = exports.downloadTool = exports.HTTPError = void 0;
-    var core2 = __importStar(require_core());
+    var core3 = __importStar(require_core());
     var io = __importStar(require_io());
     var fs = __importStar(require("fs"));
     var mm = __importStar(require_manifest());
     var os = __importStar(require("os"));
     var path2 = __importStar(require("path"));
-    var httpm = __importStar(require_http_client());
+    var httpm = __importStar(require_lib());
     var semver = __importStar(require_semver());
     var stream = __importStar(require("stream"));
     var util = __importStar(require("util"));
+    var assert_1 = require("assert");
     var v4_1 = __importDefault(require_v4());
     var exec_1 = require_exec();
-    var assert_1 = require("assert");
     var retry_helper_1 = require_retry_helper();
     var HTTPError = class extends Error {
       constructor(httpStatusCode) {
@@ -3903,8 +4207,8 @@ var require_tool_cache = __commonJS({
       return __awaiter(this, void 0, void 0, function* () {
         dest = dest || path2.join(_getTempDirectory(), v4_1.default());
         yield io.mkdirP(path2.dirname(dest));
-        core2.debug(`Downloading ${url}`);
-        core2.debug(`Destination ${dest}`);
+        core3.debug(`Downloading ${url}`);
+        core3.debug(`Destination ${dest}`);
         const maxAttempts = 3;
         const minSeconds = _getGlobal("TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS", 10);
         const maxSeconds = _getGlobal("TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS", 20);
@@ -3931,7 +4235,7 @@ var require_tool_cache = __commonJS({
           allowRetries: false
         });
         if (auth) {
-          core2.debug("set auth");
+          core3.debug("set auth");
           if (headers === void 0) {
             headers = {};
           }
@@ -3940,7 +4244,7 @@ var require_tool_cache = __commonJS({
         const response = yield http.get(url, headers);
         if (response.message.statusCode !== 200) {
           const err = new HTTPError(response.message.statusCode);
-          core2.debug(`Failed to download from "${url}". Code(${response.message.statusCode}) Message(${response.message.statusMessage})`);
+          core3.debug(`Failed to download from "${url}". Code(${response.message.statusCode}) Message(${response.message.statusMessage})`);
           throw err;
         }
         const pipeline = util.promisify(stream.pipeline);
@@ -3949,16 +4253,16 @@ var require_tool_cache = __commonJS({
         let succeeded = false;
         try {
           yield pipeline(readStream, fs.createWriteStream(dest));
-          core2.debug("download complete");
+          core3.debug("download complete");
           succeeded = true;
           return dest;
         } finally {
           if (!succeeded) {
-            core2.debug("download failed");
+            core3.debug("download failed");
             try {
               yield io.rmRF(dest);
             } catch (err) {
-              core2.debug(`Failed to delete '${dest}'. ${err.message}`);
+              core3.debug(`Failed to delete '${dest}'. ${err.message}`);
             }
           }
         }
@@ -3973,7 +4277,7 @@ var require_tool_cache = __commonJS({
         process.chdir(dest);
         if (_7zPath) {
           try {
-            const logLevel = core2.isDebug() ? "-bb1" : "-bb0";
+            const logLevel = core3.isDebug() ? "-bb1" : "-bb0";
             const args = [
               "x",
               logLevel,
@@ -4023,7 +4327,7 @@ var require_tool_cache = __commonJS({
           throw new Error("parameter 'file' is required");
         }
         dest = yield _createExtractFolder(dest);
-        core2.debug("Checking tar --version");
+        core3.debug("Checking tar --version");
         let versionOutput = "";
         yield exec_1.exec("tar --version", [], {
           ignoreReturnCode: true,
@@ -4033,7 +4337,7 @@ var require_tool_cache = __commonJS({
             stderr: (data) => versionOutput += data.toString()
           }
         });
-        core2.debug(versionOutput.trim());
+        core3.debug(versionOutput.trim());
         const isGnuTar = versionOutput.toUpperCase().includes("GNU TAR");
         let args;
         if (flags instanceof Array) {
@@ -4041,7 +4345,7 @@ var require_tool_cache = __commonJS({
         } else {
           args = [flags];
         }
-        if (core2.isDebug() && !flags.includes("v")) {
+        if (core3.isDebug() && !flags.includes("v")) {
           args.push("-v");
         }
         let destArg = dest;
@@ -4073,7 +4377,7 @@ var require_tool_cache = __commonJS({
           args = [flags];
         }
         args.push("-x", "-C", dest, "-f", file);
-        if (core2.isDebug()) {
+        if (core3.isDebug()) {
           args.push("-v");
         }
         const xarPath = yield io.which("xar", true);
@@ -4118,7 +4422,7 @@ var require_tool_cache = __commonJS({
             "-Command",
             pwshCommand
           ];
-          core2.debug(`Using pwsh at path: ${pwshPath}`);
+          core3.debug(`Using pwsh at path: ${pwshPath}`);
           yield exec_1.exec(`"${pwshPath}"`, args);
         } else {
           const powershellCommand = [
@@ -4138,7 +4442,7 @@ var require_tool_cache = __commonJS({
             powershellCommand
           ];
           const powershellPath = yield io.which("powershell", true);
-          core2.debug(`Using powershell at path: ${powershellPath}`);
+          core3.debug(`Using powershell at path: ${powershellPath}`);
           yield exec_1.exec(`"${powershellPath}"`, args);
         }
       });
@@ -4147,51 +4451,51 @@ var require_tool_cache = __commonJS({
       return __awaiter(this, void 0, void 0, function* () {
         const unzipPath = yield io.which("unzip", true);
         const args = [file];
-        if (!core2.isDebug()) {
+        if (!core3.isDebug()) {
           args.unshift("-q");
         }
         args.unshift("-o");
         yield exec_1.exec(`"${unzipPath}"`, args, { cwd: dest });
       });
     }
-    function cacheDir(sourceDir, tool, version, arch) {
+    function cacheDir2(sourceDir, tool, version2, arch) {
       return __awaiter(this, void 0, void 0, function* () {
-        version = semver.clean(version) || version;
+        version2 = semver.clean(version2) || version2;
         arch = arch || os.arch();
-        core2.debug(`Caching tool ${tool} ${version} ${arch}`);
-        core2.debug(`source dir: ${sourceDir}`);
+        core3.debug(`Caching tool ${tool} ${version2} ${arch}`);
+        core3.debug(`source dir: ${sourceDir}`);
         if (!fs.statSync(sourceDir).isDirectory()) {
           throw new Error("sourceDir is not a directory");
         }
-        const destPath = yield _createToolPath(tool, version, arch);
+        const destPath = yield _createToolPath(tool, version2, arch);
         for (const itemName of fs.readdirSync(sourceDir)) {
           const s = path2.join(sourceDir, itemName);
           yield io.cp(s, destPath, { recursive: true });
         }
-        _completeToolPath(tool, version, arch);
+        _completeToolPath(tool, version2, arch);
         return destPath;
       });
     }
-    exports.cacheDir = cacheDir;
-    function cacheFile(sourceFile, targetFile, tool, version, arch) {
+    exports.cacheDir = cacheDir2;
+    function cacheFile(sourceFile, targetFile, tool, version2, arch) {
       return __awaiter(this, void 0, void 0, function* () {
-        version = semver.clean(version) || version;
+        version2 = semver.clean(version2) || version2;
         arch = arch || os.arch();
-        core2.debug(`Caching tool ${tool} ${version} ${arch}`);
-        core2.debug(`source file: ${sourceFile}`);
+        core3.debug(`Caching tool ${tool} ${version2} ${arch}`);
+        core3.debug(`source file: ${sourceFile}`);
         if (!fs.statSync(sourceFile).isFile()) {
           throw new Error("sourceFile is not a file");
         }
-        const destFolder = yield _createToolPath(tool, version, arch);
+        const destFolder = yield _createToolPath(tool, version2, arch);
         const destPath = path2.join(destFolder, targetFile);
-        core2.debug(`destination file ${destPath}`);
+        core3.debug(`destination file ${destPath}`);
         yield io.cp(sourceFile, destPath);
-        _completeToolPath(tool, version, arch);
+        _completeToolPath(tool, version2, arch);
         return destFolder;
       });
     }
     exports.cacheFile = cacheFile;
-    function find(toolName, versionSpec, arch) {
+    function find2(toolName, versionSpec, arch) {
       if (!toolName) {
         throw new Error("toolName parameter is required");
       }
@@ -4208,17 +4512,17 @@ var require_tool_cache = __commonJS({
       if (versionSpec) {
         versionSpec = semver.clean(versionSpec) || "";
         const cachePath = path2.join(_getCacheDirectory(), toolName, versionSpec, arch);
-        core2.debug(`checking cache: ${cachePath}`);
+        core3.debug(`checking cache: ${cachePath}`);
         if (fs.existsSync(cachePath) && fs.existsSync(`${cachePath}.complete`)) {
-          core2.debug(`Found tool in cache ${toolName} ${versionSpec} ${arch}`);
+          core3.debug(`Found tool in cache ${toolName} ${versionSpec} ${arch}`);
           toolPath = cachePath;
         } else {
-          core2.debug("not found");
+          core3.debug("not found");
         }
       }
       return toolPath;
     }
-    exports.find = find;
+    exports.find = find2;
     function findAllVersions(toolName, arch) {
       const versions = [];
       arch = arch || os.arch();
@@ -4244,7 +4548,7 @@ var require_tool_cache = __commonJS({
         const http = new httpm.HttpClient("tool-cache");
         const headers = {};
         if (auth) {
-          core2.debug("set auth");
+          core3.debug("set auth");
           headers.authorization = auth;
         }
         const response = yield http.getJson(treeUrl, headers);
@@ -4265,7 +4569,7 @@ var require_tool_cache = __commonJS({
           try {
             releases = JSON.parse(versionsRaw);
           } catch (_a) {
-            core2.debug("Invalid json");
+            core3.debug("Invalid json");
           }
         }
         return releases;
@@ -4288,10 +4592,10 @@ var require_tool_cache = __commonJS({
         return dest;
       });
     }
-    function _createToolPath(tool, version, arch) {
+    function _createToolPath(tool, version2, arch) {
       return __awaiter(this, void 0, void 0, function* () {
-        const folderPath = path2.join(_getCacheDirectory(), tool, semver.clean(version) || version, arch || "");
-        core2.debug(`destination ${folderPath}`);
+        const folderPath = path2.join(_getCacheDirectory(), tool, semver.clean(version2) || version2, arch || "");
+        core3.debug(`destination ${folderPath}`);
         const markerPath = `${folderPath}.complete`;
         yield io.rmRF(folderPath);
         yield io.rmRF(markerPath);
@@ -4299,23 +4603,23 @@ var require_tool_cache = __commonJS({
         return folderPath;
       });
     }
-    function _completeToolPath(tool, version, arch) {
-      const folderPath = path2.join(_getCacheDirectory(), tool, semver.clean(version) || version, arch || "");
+    function _completeToolPath(tool, version2, arch) {
+      const folderPath = path2.join(_getCacheDirectory(), tool, semver.clean(version2) || version2, arch || "");
       const markerPath = `${folderPath}.complete`;
       fs.writeFileSync(markerPath, "");
-      core2.debug("finished caching tool");
+      core3.debug("finished caching tool");
     }
     function isExplicitVersion(versionSpec) {
       const c = semver.clean(versionSpec) || "";
-      core2.debug(`isExplicit: ${c}`);
+      core3.debug(`isExplicit: ${c}`);
       const valid = semver.valid(c) != null;
-      core2.debug(`explicit? ${valid}`);
+      core3.debug(`explicit? ${valid}`);
       return valid;
     }
     exports.isExplicitVersion = isExplicitVersion;
     function evaluateVersions(versions, versionSpec) {
-      let version = "";
-      core2.debug(`evaluating ${versions.length} versions`);
+      let version2 = "";
+      core3.debug(`evaluating ${versions.length} versions`);
       versions = versions.sort((a, b) => {
         if (semver.gt(a, b)) {
           return 1;
@@ -4326,16 +4630,16 @@ var require_tool_cache = __commonJS({
         const potential = versions[i];
         const satisfied = semver.satisfies(potential, versionSpec);
         if (satisfied) {
-          version = potential;
+          version2 = potential;
           break;
         }
       }
-      if (version) {
-        core2.debug(`matched: ${version}`);
+      if (version2) {
+        core3.debug(`matched: ${version2}`);
       } else {
-        core2.debug("match not found");
+        core3.debug("match not found");
       }
-      return version;
+      return version2;
     }
     exports.evaluateVersions = evaluateVersions;
     function _getCacheDirectory() {
@@ -4395,7 +4699,7 @@ var require_re = __commonJS({
     var R = 0;
     var createToken = (name, value, isGlobal) => {
       const index = R++;
-      debug(index, value);
+      debug(name, index, value);
       t[name] = index;
       src[index] = value;
       re[index] = new RegExp(value, isGlobal ? "g" : void 0);
@@ -4441,8 +4745,8 @@ var require_re = __commonJS({
     createToken("HYPHENRANGE", `^\\s*(${src[t.XRANGEPLAIN]})\\s+-\\s+(${src[t.XRANGEPLAIN]})\\s*$`);
     createToken("HYPHENRANGELOOSE", `^\\s*(${src[t.XRANGEPLAINLOOSE]})\\s+-\\s+(${src[t.XRANGEPLAINLOOSE]})\\s*$`);
     createToken("STAR", "(<|>)?=?\\s*\\*");
-    createToken("GTE0", "^\\s*>=\\s*0.0.0\\s*$");
-    createToken("GTE0PRE", "^\\s*>=\\s*0.0.0-0\\s*$");
+    createToken("GTE0", "^\\s*>=\\s*0\\.0\\.0\\s*$");
+    createToken("GTE0PRE", "^\\s*>=\\s*0\\.0\\.0-0\\s*$");
   }
 });
 
@@ -4450,9 +4754,9 @@ var require_re = __commonJS({
 var require_parse_options = __commonJS({
   "node_modules/semver/internal/parse-options.js"(exports, module2) {
     var opts = ["includePrerelease", "loose", "rtl"];
-    var parseOptions = (options) => !options ? {} : typeof options !== "object" ? { loose: true } : opts.filter((k) => options[k]).reduce((options2, k) => {
-      options2[k] = true;
-      return options2;
+    var parseOptions = (options) => !options ? {} : typeof options !== "object" ? { loose: true } : opts.filter((k) => options[k]).reduce((o, k) => {
+      o[k] = true;
+      return o;
     }, {});
     module2.exports = parseOptions;
   }
@@ -4487,30 +4791,30 @@ var require_semver2 = __commonJS({
     var { re, t } = require_re();
     var parseOptions = require_parse_options();
     var { compareIdentifiers } = require_identifiers();
-    var SemVer2 = class {
-      constructor(version, options) {
+    var SemVer3 = class {
+      constructor(version2, options) {
         options = parseOptions(options);
-        if (version instanceof SemVer2) {
-          if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) {
-            return version;
+        if (version2 instanceof SemVer3) {
+          if (version2.loose === !!options.loose && version2.includePrerelease === !!options.includePrerelease) {
+            return version2;
           } else {
-            version = version.version;
+            version2 = version2.version;
           }
-        } else if (typeof version !== "string") {
-          throw new TypeError(`Invalid Version: ${version}`);
+        } else if (typeof version2 !== "string") {
+          throw new TypeError(`Invalid Version: ${version2}`);
         }
-        if (version.length > MAX_LENGTH) {
+        if (version2.length > MAX_LENGTH) {
           throw new TypeError(`version is longer than ${MAX_LENGTH} characters`);
         }
-        debug("SemVer", version, options);
+        debug("SemVer", version2, options);
         this.options = options;
         this.loose = !!options.loose;
         this.includePrerelease = !!options.includePrerelease;
-        const m = version.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
+        const m = version2.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
         if (!m) {
-          throw new TypeError(`Invalid Version: ${version}`);
+          throw new TypeError(`Invalid Version: ${version2}`);
         }
-        this.raw = version;
+        this.raw = version2;
         this.major = +m[1];
         this.minor = +m[2];
         this.patch = +m[3];
@@ -4551,11 +4855,11 @@ var require_semver2 = __commonJS({
       }
       compare(other) {
         debug("SemVer.compare", this.version, this.options, other);
-        if (!(other instanceof SemVer2)) {
+        if (!(other instanceof SemVer3)) {
           if (typeof other === "string" && other === this.version) {
             return 0;
           }
-          other = new SemVer2(other, this.options);
+          other = new SemVer3(other, this.options);
         }
         if (other.version === this.version) {
           return 0;
@@ -4563,14 +4867,14 @@ var require_semver2 = __commonJS({
         return this.compareMain(other) || this.comparePre(other);
       }
       compareMain(other) {
-        if (!(other instanceof SemVer2)) {
-          other = new SemVer2(other, this.options);
+        if (!(other instanceof SemVer3)) {
+          other = new SemVer3(other, this.options);
         }
         return compareIdentifiers(this.major, other.major) || compareIdentifiers(this.minor, other.minor) || compareIdentifiers(this.patch, other.patch);
       }
       comparePre(other) {
-        if (!(other instanceof SemVer2)) {
-          other = new SemVer2(other, this.options);
+        if (!(other instanceof SemVer3)) {
+          other = new SemVer3(other, this.options);
         }
         if (this.prerelease.length && !other.prerelease.length) {
           return -1;
@@ -4598,8 +4902,8 @@ var require_semver2 = __commonJS({
         } while (++i);
       }
       compareBuild(other) {
-        if (!(other instanceof SemVer2)) {
-          other = new SemVer2(other, this.options);
+        if (!(other instanceof SemVer3)) {
+          other = new SemVer3(other, this.options);
         }
         let i = 0;
         do {
@@ -4682,7 +4986,7 @@ var require_semver2 = __commonJS({
               }
             }
             if (identifier) {
-              if (this.prerelease[0] === identifier) {
+              if (compareIdentifiers(this.prerelease[0], identifier) === 0) {
                 if (isNaN(this.prerelease[1])) {
                   this.prerelease = [identifier, 0];
                 }
@@ -4699,7 +5003,7 @@ var require_semver2 = __commonJS({
         return this;
       }
     };
-    module2.exports = SemVer2;
+    module2.exports = SemVer3;
   }
 });
 
@@ -4744,1532 +5048,1054 @@ var require_string_argv = __commonJS({
   }
 });
 
-// node_modules/myzod/libs/types.js
-var require_types = __commonJS({
-  "node_modules/myzod/libs/types.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.LazyType = exports.PartialType = exports.EnumType = exports.IntersectionType = exports.UnionType = exports.TupleType = exports.ArrayType = exports.ObjectType = exports.keySignature = exports.DateType = exports.NullableType = exports.OptionalType = exports.UnknownType = exports.LiteralType = exports.NullType = exports.UndefinedType = exports.BigIntType = exports.NumberType = exports.BooleanType = exports.StringType = exports.ValidationError = exports.Type = void 0;
-    function clone(value) {
-      if (typeof value !== "object" || value === null) {
-        return value;
-      }
-      if (Array.isArray(value)) {
-        return value.map((elem) => clone(elem));
-      }
-      const cpy = /* @__PURE__ */ Object.create(null);
-      for (const k in value) {
-        cpy[k] = clone(value[k]);
-      }
-      for (const s of Object.getOwnPropertySymbols(value)) {
-        cpy[s] = clone(value[s]);
-      }
-      Object.setPrototypeOf(cpy, Object.getPrototypeOf(value));
-      return cpy;
-    }
-    var typeErrSym = Symbol("typeError");
-    var coercionTypeSymbol = Symbol("coercion");
-    var Type = class {
-      constructor() {
-      }
-      or(schema) {
-        return new UnionType([this, schema]);
-      }
-      optional() {
-        if (this instanceof OptionalType) {
-          return clone(this);
-        }
-        return new OptionalType(this);
-      }
-      nullable() {
-        if (this instanceof NullableType) {
-          return clone(this);
-        }
-        return new NullableType(this);
-      }
-      try(value) {
-        try {
-          return this.parse.apply(this, arguments);
-        } catch (err) {
-          return err;
-        }
-      }
-      map(fn) {
-        return new MTypeClass(this, fn);
-      }
-      onTypeError(msg) {
-        const cpy = clone(this);
-        cpy[typeErrSym] = msg;
-        return cpy;
-      }
-      typeError(msg) {
-        const errMsg = (() => {
-          const typErrValue = this[typeErrSym];
-          if (typErrValue === void 0) {
-            return msg;
-          }
-          if (typeof typErrValue === "function") {
-            return typErrValue();
-          }
-          return typErrValue;
-        })();
-        return new ValidationError(errMsg);
-      }
-    };
-    exports.Type = Type;
-    var MTypeClass = class extends Type {
-      constructor(schema, mapFn) {
-        super();
-        this.schema = schema;
-        this.mapFn = mapFn;
-        this.predicates = null;
-        this[coercionTypeSymbol] = true;
-      }
-      parse(value) {
-        const ret = value === void 0 && this.defaultValue ? typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue : this.mapFn(this.schema.parse(value));
-        if (this.predicates) {
-          applyPredicates(this.predicates, ret);
-        }
-        return ret;
-      }
-      and(other) {
-        throw new Error("mapped types cannot be intersected");
-      }
-      withPredicate(fn, errMsg) {
-        return withPredicate(this, { func: fn, errMsg });
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    var ValidationError = class extends Error {
-      constructor(message, path2, collectedErrors) {
-        if (collectedErrors !== void 0) {
-          message = Object.values(collectedErrors).map((err) => `error parsing object at path: "${prettyPrintPath((err === null || err === void 0 ? void 0 : err.path) || [])}" - ${err === null || err === void 0 ? void 0 : err.message}`).join("\n");
-        }
-        super(message);
-        this.name = "MyZodError";
-        this.path = path2;
-        this.collectedErrors = collectedErrors;
-      }
-    };
-    exports.ValidationError = ValidationError;
-    function typeOf(value) {
-      if (value === null) {
-        return "null";
-      }
-      if (Array.isArray(value)) {
-        return "array";
-      }
-      return typeof value;
-    }
-    function prettyPrintPath(path2) {
-      return path2.reduce((acc, elem, idx) => {
-        if (typeof elem === "number") {
-          acc += `[${elem}]`;
-        } else if (idx === 0) {
-          acc += elem;
-        } else {
-          acc += "." + elem;
-        }
-        return acc;
-      }, "");
-    }
-    var allowUnknownSymbol = Symbol("allowUnknown");
-    var shapekeysSymbol = Symbol("shapeKeys");
-    var normalizePredicates = (predicate) => {
-      if (!predicate) {
-        return null;
-      }
-      if (typeof predicate === "function") {
-        return [{ func: predicate }];
-      }
-      if (Array.isArray(predicate)) {
-        return predicate;
-      }
-      return [predicate];
-    };
-    var applyPredicates = (predicates, value) => {
-      try {
-        for (const predicate of predicates) {
-          if (!predicate.func(value)) {
-            throw new ValidationError(predicate.errMsg ? typeof predicate.errMsg === "function" ? predicate.errMsg(value) : predicate.errMsg : "failed anonymous predicate function");
-          }
-        }
-      } catch (err) {
-        if (err instanceof ValidationError) {
-          throw err;
-        }
-        throw new ValidationError(err.message);
-      }
-    };
-    var appendPredicate = (predicates, pred) => {
-      if (!predicates) {
-        return [pred];
-      }
-      return [...predicates, pred];
-    };
-    var withPredicate = (schema, predicate) => {
-      const cpy = clone(schema);
-      cpy.predicates = appendPredicate(cpy.predicates, predicate);
-      return cpy;
-    };
-    var withDefault = (schema, value) => {
-      const cpy = clone(schema);
-      cpy[coercionTypeSymbol] = true;
-      cpy.defaultValue = value;
-      return cpy;
-    };
-    var StringType = class extends Type {
-      constructor(opts) {
-        super();
-        this.predicates = normalizePredicates(opts === null || opts === void 0 ? void 0 : opts.predicate);
-        this.defaultValue = opts === null || opts === void 0 ? void 0 : opts.default;
-        this[coercionTypeSymbol] = (opts === null || opts === void 0 ? void 0 : opts.default) !== void 0;
-        let self = this;
-        if (typeof (opts === null || opts === void 0 ? void 0 : opts.min) !== "undefined") {
-          self = self.min(opts.min);
-        }
-        if (typeof (opts === null || opts === void 0 ? void 0 : opts.max) !== "undefined") {
-          self = self.max(opts.max);
-        }
-        if (typeof (opts === null || opts === void 0 ? void 0 : opts.pattern) !== "undefined") {
-          self = self.pattern(opts.pattern);
-        }
-        if (opts === null || opts === void 0 ? void 0 : opts.valid) {
-          self = self.valid(opts.valid);
-        }
-        return self;
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        if (typeof value !== "string") {
-          throw this.typeError("expected type to be string but got " + typeOf(value));
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, value);
-        }
-        return value;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      pattern(regexp, errMsg) {
-        return this.withPredicate((value) => regexp.test(value), errMsg || `expected string to match pattern ${regexp} but did not`);
-      }
-      min(x, errMsg) {
-        return this.withPredicate((value) => value.length >= x, errMsg || ((value) => `expected string to have length greater than or equal to ${x} but had length ${value.length}`));
-      }
-      max(x, errMsg) {
-        return this.withPredicate((value) => value.length <= x, errMsg || ((value) => `expected string to have length less than or equal to ${x} but had length ${value.length}`));
-      }
-      valid(list, errMsg) {
-        return this.withPredicate((value) => list.includes(value), errMsg || `expected string to be one of: ${JSON.stringify(list)}`);
-      }
-      withPredicate(fn, errMsg) {
-        return withPredicate(this, { func: fn, errMsg });
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.StringType = StringType;
-    var BooleanType = class extends Type {
-      constructor(defaultValue) {
-        super();
-        this.defaultValue = defaultValue;
-        this[coercionTypeSymbol] = defaultValue !== void 0;
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        if (typeof value !== "boolean") {
-          throw this.typeError("expected type to be boolean but got " + typeOf(value));
-        }
-        return value;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.BooleanType = BooleanType;
-    var NumberType = class extends Type {
-      constructor(opts = {}) {
-        super();
-        this.coerceFlag = opts.coerce;
-        this.predicates = normalizePredicates(opts.predicate);
-        this.defaultValue = opts.default;
-        this[coercionTypeSymbol] = !!opts.coerce || opts.default !== void 0;
-        let self = this;
-        if (typeof opts.max !== "undefined") {
-          self = self.max(opts.max);
-        }
-        if (typeof opts.min !== "undefined") {
-          self = self.min(opts.min);
-        }
-        return self;
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        if (this.coerceFlag && typeof value === "string") {
-          const number = parseFloat(value);
-          if (isNaN(number)) {
-            throw this.typeError("expected type to be number but got string");
-          }
-          return this.parse(number);
-        }
-        if (typeof value !== "number") {
-          throw this.typeError("expected type to be number but got " + typeOf(value));
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, value);
-        }
-        return value;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      min(x, errMsg) {
-        return this.withPredicate((value) => value >= x, errMsg || ((value) => `expected number to be greater than or equal to ${x} but got ${value}`));
-      }
-      max(x, errMsg) {
-        return this.withPredicate((value) => value <= x, errMsg || ((value) => `expected number to be less than or equal to ${x} but got ${value}`));
-      }
-      coerce(value) {
-        return new NumberType({
-          predicate: this.predicates || void 0,
-          coerce: value !== void 0 ? value : true,
-          default: this.defaultValue
-        });
-      }
-      withPredicate(fn, errMsg) {
-        return withPredicate(this, { func: fn, errMsg });
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.NumberType = NumberType;
-    var BigIntType = class extends Type {
-      constructor(opts = {}) {
-        super();
-        this[coercionTypeSymbol] = true;
-        this.predicates = normalizePredicates(opts.predicate);
-        this.defaultValue = opts.default;
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        try {
-          const int = BigInt(value);
-          if (this.predicates) {
-            applyPredicates(this.predicates, int);
-          }
-          return int;
-        } catch (err) {
-          if (err instanceof ValidationError) {
-            throw err;
-          }
-          throw this.typeError("expected type to be bigint interpretable - " + err.message.toLowerCase());
-        }
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      min(x, errMsg) {
-        return this.withPredicate((value) => value >= x, errMsg || ((value) => `expected bigint to be greater than or equal to ${x} but got ${value}`));
-      }
-      max(x, errMsg) {
-        return this.withPredicate((value) => value <= x, errMsg || ((value) => `expected bigint to be less than or equal to ${x} but got ${value}`));
-      }
-      withPredicate(fn, errMsg) {
-        return withPredicate(this, { func: fn, errMsg });
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.BigIntType = BigIntType;
-    var UndefinedType = class extends Type {
-      parse(value) {
-        if (value !== void 0) {
-          throw this.typeError("expected type to be undefined but got " + typeOf(value));
-        }
-        return value;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-    };
-    exports.UndefinedType = UndefinedType;
-    var NullType = class extends Type {
-      constructor() {
-        super();
-      }
-      parse(value = this.defaultValue) {
-        if (value !== null) {
-          throw this.typeError("expected type to be null but got " + typeOf(value));
-        }
-        return value;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      default() {
-        return withDefault(this, null);
-      }
-    };
-    exports.NullType = NullType;
-    var LiteralType = class extends Type {
-      constructor(literal) {
-        super();
-        this.literal = literal;
-      }
-      parse(value = this.defaultValue) {
-        if (value !== this.literal) {
-          const typeofValue = typeof value !== "object" ? JSON.stringify(value) : typeOf(value);
-          throw this.typeError(`expected value to be literal ${JSON.stringify(this.literal)} but got ${typeofValue}`);
-        }
-        return value;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      default() {
-        return withDefault(this, this.literal);
-      }
-    };
-    exports.LiteralType = LiteralType;
-    var UnknownType = class extends Type {
-      constructor() {
-        super();
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        return value;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.UnknownType = UnknownType;
-    var OptionalType = class extends Type {
-      constructor(schema) {
-        super();
-        this.schema = schema;
-        this[coercionTypeSymbol] = this.schema[coercionTypeSymbol];
-        this[shapekeysSymbol] = this.schema[shapekeysSymbol];
-        this[allowUnknownSymbol] = this.schema[allowUnknownSymbol];
-      }
-      parse(value, opts) {
-        if (value === void 0) {
-          return void 0;
-        }
-        return this.schema.parse(value, opts);
-      }
-      required() {
-        return clone(this.schema);
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-    };
-    exports.OptionalType = OptionalType;
-    var NullableType = class extends Type {
-      constructor(schema) {
-        super();
-        this.schema = schema;
-        this[coercionTypeSymbol] = this.schema[coercionTypeSymbol];
-        this[shapekeysSymbol] = this.schema[shapekeysSymbol];
-        this[allowUnknownSymbol] = this.schema[allowUnknownSymbol];
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        if (value === null) {
-          return null;
-        }
-        return this.schema.parse(value);
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      required() {
-        return clone(this.schema);
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.NullableType = NullableType;
-    var DateType = class extends Type {
-      constructor(opts) {
-        super();
-        this[coercionTypeSymbol] = true;
-        this.predicates = normalizePredicates(opts === null || opts === void 0 ? void 0 : opts.predicate);
-        this.defaultValue = opts === null || opts === void 0 ? void 0 : opts.default;
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        const date = typeof value === "string" ? this.stringToDate(value) : this.assertDate(value);
-        if (this.predicates) {
-          applyPredicates(this.predicates, date);
-        }
-        return date;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      withPredicate(fn, errMsg) {
-        return withPredicate(this, { func: fn, errMsg });
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-      stringToDate(str) {
-        const date = new Date(str);
-        if (isNaN(date.getTime())) {
-          throw this.typeError(`expected date string to be valid date`);
-        }
-        return date;
-      }
-      assertDate(date) {
-        if (!(date instanceof Date)) {
-          throw this.typeError("expected type Date but got " + typeOf(date));
-        }
-        return date;
-      }
-    };
-    exports.DateType = DateType;
-    exports.keySignature = Symbol("keySignature");
-    var ObjectType = class extends Type {
-      constructor(objectShape, opts) {
-        super();
-        this.objectShape = objectShape;
-        this.predicates = normalizePredicates(opts === null || opts === void 0 ? void 0 : opts.predicate);
-        this.defaultValue = opts === null || opts === void 0 ? void 0 : opts.default;
-        this.shouldCollectErrors = (opts === null || opts === void 0 ? void 0 : opts.collectErrors) === true;
-        const keys = Object.keys(this.objectShape);
-        this[exports.keySignature] = this.objectShape[exports.keySignature];
-        this[allowUnknownSymbol] = (opts === null || opts === void 0 ? void 0 : opts.allowUnknown) === true;
-        this[shapekeysSymbol] = keys;
-        this[coercionTypeSymbol] = this.defaultValue !== void 0 || this[allowUnknownSymbol] || Object.values(this.objectShape).some((schema) => schema[coercionTypeSymbol]) || !!(this.objectShape[exports.keySignature] && this.objectShape[exports.keySignature][coercionTypeSymbol]);
-        this._parse = this.selectParser();
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue, parseOpts = {}) {
-        if (typeof value !== "object" || value === null || Array.isArray(value)) {
-          throw this.typeError("expected type to be object but got " + typeOf(value));
-        }
-        const keys = this[shapekeysSymbol];
-        const allowUnknown = parseOpts.allowUnknown || this[allowUnknownSymbol];
-        if (!allowUnknown && !this.objectShape[exports.keySignature]) {
-          const illegalKeys = [];
-          for (const k in value) {
-            if (!keys.includes(k)) {
-              illegalKeys.push(k);
-            }
-          }
-          if (illegalKeys.length > 0) {
-            throw this.typeError("unexpected keys on object: " + JSON.stringify(illegalKeys));
-          }
-        }
-        return this._parse(value, parseOpts);
-      }
-      buildPathError(err, key, parseOpts) {
-        const path2 = err.path ? [key, ...err.path] : [key];
-        const msg = parseOpts.suppressPathErrMsg ? err.message : `error parsing object at path: "${prettyPrintPath(path2)}" - ${err.message}`;
-        return new ValidationError(msg, path2);
-      }
-      selectParser() {
-        if (this[shapekeysSymbol].length === 0 && this[exports.keySignature]) {
-          if (this[coercionTypeSymbol] && this.shouldCollectErrors) {
-            return this.parseRecordConvCollect;
-          }
-          if (this[coercionTypeSymbol]) {
-            return this.parseRecordConv;
-          }
-          if (this.shouldCollectErrors) {
-            return this.parseRecordCollect;
-          }
-          return this.parseRecord;
-        }
-        if (this[exports.keySignature]) {
-          if (this[coercionTypeSymbol] && this.shouldCollectErrors) {
-            return this.parseMixRecordConvCollect;
-          }
-          if (this[coercionTypeSymbol]) {
-            return this.parseMixRecordConv;
-          }
-          if (this.shouldCollectErrors) {
-            return this.parseMixRecordCollect;
-          }
-          return this.parseMixRecord;
-        }
-        if (this[coercionTypeSymbol] && this.shouldCollectErrors) {
-          return this.parseObjectConvCollect;
-        }
-        if (this[coercionTypeSymbol]) {
-          return this.parseObjectConv;
-        }
-        if (this.shouldCollectErrors) {
-          return this.parseObjectCollect;
-        }
-        return this.parseObject;
-      }
-      parseObject(value, parseOpts) {
-        for (const key of this[shapekeysSymbol]) {
-          try {
-            const schema = this.objectShape[key];
-            if (schema instanceof UnknownType && !value.hasOwnProperty(key)) {
-              throw schema.typeError(`expected key "${key}" of unknown type to be present on object`);
-            }
-            schema.parse(value[key], { suppressPathErrMsg: true });
-          } catch (err) {
-            throw this.buildPathError(err, key, parseOpts);
-          }
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, value);
-        }
-        return value;
-      }
-      parseObjectCollect(value, parseOpts) {
-        let hasError = false;
-        const errs = {};
-        for (const key of this[shapekeysSymbol]) {
-          const schema = this.objectShape[key];
-          if (schema instanceof UnknownType && !value.hasOwnProperty(key)) {
-            hasError = true;
-            errs[key] = this.buildPathError(schema.typeError(`expected key "${key}" of unknown type to be present on object`), key, { suppressPathErrMsg: true });
-            continue;
-          }
-          const result = schema.try(value[key], { suppressPathErrMsg: true });
-          if (result instanceof ValidationError) {
-            hasError = true;
-            errs[key] = this.buildPathError(result, key, { suppressPathErrMsg: true });
-          }
-        }
-        if (hasError) {
-          throw new ValidationError("", void 0, errs);
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, value);
-        }
-        return value;
-      }
-      parseObjectConv(value, parseOpts) {
-        const convVal = {};
-        for (const key of this[shapekeysSymbol]) {
-          try {
-            const schema = this.objectShape[key];
-            if (schema instanceof UnknownType && !value.hasOwnProperty(key)) {
-              throw schema.typeError(`expected key "${key}" of unknown type to be present on object`);
-            }
-            convVal[key] = schema.parse(value[key], { suppressPathErrMsg: true });
-          } catch (err) {
-            throw this.buildPathError(err, key, parseOpts);
-          }
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, convVal);
-        }
-        return convVal;
-      }
-      parseObjectConvCollect(value, parseOpts) {
-        const convVal = {};
-        const errs = {};
-        let hasError = false;
-        for (const key of this[shapekeysSymbol]) {
-          const schema = this.objectShape[key];
-          if (schema instanceof UnknownType && !value.hasOwnProperty(key)) {
-            hasError = true;
-            errs[key] = this.buildPathError(schema.typeError(`expected key "${key}" of unknown type to be present on object`), key, { suppressPathErrMsg: true });
-            continue;
-          }
-          const result = schema.try(value[key], { suppressPathErrMsg: true });
-          if (result instanceof ValidationError) {
-            hasError = true;
-            errs[key] = this.buildPathError(result, key, { suppressPathErrMsg: true });
-          } else {
-            convVal[key] = result;
-          }
-        }
-        if (hasError) {
-          throw new ValidationError("", void 0, errs);
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, convVal);
-        }
-        return convVal;
-      }
-      parseRecord(value, parseOpts) {
-        for (const key in value) {
-          try {
-            this[exports.keySignature].parse(value[key], { suppressPathErrMsg: true });
-          } catch (err) {
-            throw this.buildPathError(err, key, parseOpts);
-          }
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, value);
-        }
-        return value;
-      }
-      parseRecordCollect(value, parseOpts) {
-        let hasError = false;
-        const errs = {};
-        for (const key in value) {
-          const result = this[exports.keySignature].try(value[key], { suppressPathErrMsg: true });
-          if (result instanceof ValidationError) {
-            hasError = true;
-            errs[key] = this.buildPathError(result, key, { suppressPathErrMsg: true });
-          }
-        }
-        if (hasError) {
-          throw new ValidationError("", void 0, errs);
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, value);
-        }
-        return value;
-      }
-      parseRecordConv(value, parseOpts) {
-        const convVal = {};
-        for (const key in value) {
-          try {
-            convVal[key] = this[exports.keySignature].parse(value[key], { suppressPathErrMsg: true });
-          } catch (err) {
-            throw this.buildPathError(err, key, parseOpts);
-          }
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, convVal);
-        }
-        return convVal;
-      }
-      parseRecordConvCollect(value, parseOpts) {
-        const convVal = {};
-        const errs = {};
-        let hasError = false;
-        for (const key in value) {
-          const result = this[exports.keySignature].try(value[key], { suppressPathErrMsg: true });
-          if (result instanceof ValidationError) {
-            hasError = true;
-            errs[key] = this.buildPathError(result, key, { suppressPathErrMsg: true });
-          } else {
-            convVal[key] = result;
-          }
-        }
-        if (hasError) {
-          throw new ValidationError("", void 0, errs);
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, convVal);
-        }
-        return convVal;
-      }
-      parseMixRecord(value, parseOpts) {
-        for (const key of new Set(Object.keys(value).concat(this[shapekeysSymbol]))) {
-          try {
-            (this.objectShape[key] || this[exports.keySignature]).parse(value[key], { suppressPathErrMsg: true });
-          } catch (err) {
-            throw this.buildPathError(err, key, parseOpts);
-          }
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, value);
-        }
-        return value;
-      }
-      parseMixRecordCollect(value, parseOpts) {
-        let hasError = false;
-        const errs = {};
-        for (const key of new Set(Object.keys(value).concat(this[shapekeysSymbol]))) {
-          const result = (this.objectShape[key] || this[exports.keySignature]).try(value[key], {
-            suppressPathErrMsg: true
-          });
-          if (result instanceof ValidationError) {
-            hasError = true;
-            errs[key] = this.buildPathError(result, key, { suppressPathErrMsg: true });
-          }
-        }
-        if (hasError) {
-          throw new ValidationError("", void 0, errs);
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, value);
-        }
-        return value;
-      }
-      parseMixRecordConv(value, parseOpts) {
-        const convVal = {};
-        for (const key of new Set(Object.keys(value).concat(this[shapekeysSymbol]))) {
-          try {
-            convVal[key] = (this.objectShape[key] || this[exports.keySignature]).parse(value[key], {
-              suppressPathErrMsg: true
-            });
-          } catch (err) {
-            throw this.buildPathError(err, key, parseOpts);
-          }
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, convVal);
-        }
-        return convVal;
-      }
-      parseMixRecordConvCollect(value, parseOpts) {
-        const convVal = {};
-        const errs = {};
-        let hasError = false;
-        for (const key of new Set(Object.keys(value).concat(this[shapekeysSymbol]))) {
-          const result = (this.objectShape[key] || this[exports.keySignature]).try(value[key], {
-            suppressPathErrMsg: true
-          });
-          if (result instanceof ValidationError) {
-            hasError = true;
-            errs[key] = this.buildPathError(result, key, { suppressPathErrMsg: true });
-          } else {
-            convVal[key] = result;
-          }
-        }
-        if (hasError) {
-          throw new ValidationError("", void 0, errs);
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, convVal);
-        }
-        return convVal;
-      }
-      and(schema) {
-        if (schema instanceof ObjectType) {
-          const keySet = /* @__PURE__ */ new Set([...this[shapekeysSymbol], ...schema[shapekeysSymbol]]);
-          const intersectShape = Array.from(keySet).reduce((acc, key) => {
-            if (this.objectShape[key] && schema.objectShape[key]) {
-              acc[key] = this.objectShape[key].and(schema.objectShape[key]);
-            } else if (this.objectShape[key]) {
-              acc[key] = this.objectShape[key];
-            } else {
-              acc[key] = schema.objectShape[key];
-            }
-            return acc;
-          }, {});
-          const selfKeySig = this.objectShape[exports.keySignature];
-          const targetKeySig = schema[exports.keySignature];
-          if (selfKeySig && targetKeySig) {
-            intersectShape[exports.keySignature] = selfKeySig.and(targetKeySig);
-          } else if (selfKeySig || targetKeySig) {
-            intersectShape[exports.keySignature] = selfKeySig || targetKeySig;
-          }
-          return new ObjectType(intersectShape);
-        }
-        return new IntersectionType(this, schema);
-      }
-      pick(keys, opts) {
-        const pickedShape = keys.reduce((acc, key) => {
-          if (this.objectShape[key] || this.objectShape[exports.keySignature]) {
-            acc[key] = this.objectShape[key] || this.objectShape[exports.keySignature];
-          }
-          return acc;
-        }, {});
-        return new ObjectType(pickedShape, opts);
-      }
-      omit(keys, opts) {
-        const pickedKeys = this[shapekeysSymbol].filter((x) => !keys.includes(x));
-        if (!this[exports.keySignature]) {
-          return this.pick(pickedKeys, opts);
-        }
-        return this.pick(pickedKeys, opts).and(new ObjectType({ [exports.keySignature]: this[exports.keySignature] }));
-      }
-      partial(opts) {
-        const originalShape = this.objectShape;
-        const shape = Object.keys(originalShape).reduce((acc, key) => {
-          if (opts === null || opts === void 0 ? void 0 : opts.deep) {
-            acc[key] = toPartialSchema(originalShape[key], opts).optional();
-          } else {
-            acc[key] = originalShape[key].optional();
-          }
-          return acc;
-        }, {});
-        const keysig = originalShape[exports.keySignature];
-        if (keysig) {
-          if (opts === null || opts === void 0 ? void 0 : opts.deep) {
-            shape[exports.keySignature] = toPartialSchema(keysig, opts).optional();
-          } else {
-            shape[exports.keySignature] = keysig.optional();
-          }
-        }
-        return new ObjectType(shape, { allowUnknown: this[allowUnknownSymbol] });
-      }
-      shape() {
-        return Object.assign({}, this.objectShape);
-      }
-      withPredicate(fn, errMsg) {
-        return withPredicate(this, { func: fn, errMsg });
-      }
-      default(value) {
-        const cpy = withDefault(this, value);
-        cpy._parse = cpy.selectParser();
-        return cpy;
-      }
-      collectErrors(value = true) {
-        const cpy = clone(this);
-        cpy.shouldCollectErrors = value;
-        cpy._parse = cpy.selectParser();
-        return cpy;
-      }
-      allowUnknownKeys(value = true) {
-        const cpy = clone(this);
-        cpy[allowUnknownSymbol] = value;
-        cpy[coercionTypeSymbol] = cpy[coercionTypeSymbol] || value;
-        cpy._parse = cpy.selectParser();
-        return cpy;
-      }
-    };
-    exports.ObjectType = ObjectType;
-    var ArrayType = class extends Type {
-      constructor(schema, opts = {}) {
-        super();
-        this.schema = schema;
-        this.predicates = normalizePredicates(opts.predicate);
-        this.defaultValue = opts.default;
-        this.coerceFn = opts.coerce;
-        this[coercionTypeSymbol] = typeof this.coerceFn === "function" || this.defaultValue !== void 0 || this.schema[coercionTypeSymbol];
-        this._parse = this.schema instanceof ObjectType || this.schema instanceof ArrayType || this.schema instanceof LazyType ? (elem, parseOptions) => this.schema.parse(elem, {
-          allowUnknown: parseOptions === null || parseOptions === void 0 ? void 0 : parseOptions.allowUnknown,
-          suppressPathErrMsg: true
-        }) : (elem) => this.schema.parse(elem);
-        let self = this;
-        if (typeof opts.length !== "undefined") {
-          self = self.length(opts.length);
-        }
-        if (typeof opts.min !== "undefined") {
-          self = self.min(opts.min);
-        }
-        if (typeof opts.max !== "undefined") {
-          self = self.max(opts.max);
-        }
-        if (opts.unique === true) {
-          self = self.unique();
-        }
-        return self;
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue, parseOptions) {
-        if (typeof value === "string" && typeof this.coerceFn === "function" && !(parseOptions === null || parseOptions === void 0 ? void 0 : parseOptions.coerced)) {
-          try {
-            return this.parse(this.coerceFn(value), Object.assign(Object.assign({}, parseOptions), { coerced: true }));
-          } catch (e) {
-            if (e instanceof ValidationError) {
-              throw e;
-            }
-            throw new ValidationError("error coercing string value to array - " + e.message);
-          }
-        }
-        if (!Array.isArray(value)) {
-          throw this.typeError("expected an array but got " + typeOf(value));
-        }
-        const convValue = this[coercionTypeSymbol] ? [] : void 0;
-        for (let i = 0; i < value.length; i++) {
-          try {
-            if (convValue) {
-              convValue[i] = this._parse(value[i]);
-            } else {
-              this._parse(value[i], parseOptions);
-            }
-          } catch (err) {
-            const path2 = err.path ? [i, ...err.path] : [i];
-            const msg = (parseOptions === null || parseOptions === void 0 ? void 0 : parseOptions.suppressPathErrMsg) ? err.message : `error at ${prettyPrintPath(path2)} - ${err.message}`;
-            throw new ValidationError(msg, path2);
-          }
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, convValue || value);
-        }
-        return convValue || value;
-      }
-      length(value, errMsg) {
-        return this.withPredicate((arr) => arr.length === value, errMsg || ((arr) => `expected array to have length ${value} but got ${arr.length}`));
-      }
-      min(value, errMsg) {
-        return this.withPredicate((arr) => arr.length >= value, errMsg || ((arr) => `expected array to have length greater than or equal to ${value} but got ${arr.length}`));
-      }
-      max(value, errMsg) {
-        return this.withPredicate((arr) => arr.length <= value, errMsg || ((arr) => `expected array to have length less than or equal to ${value} but got ${arr.length}`));
-      }
-      unique() {
-        return this.withPredicate((arr) => {
-          const seenMap = /* @__PURE__ */ new Map();
-          arr.forEach((elem, idx) => {
-            const seenAt = seenMap.get(elem);
-            if (seenAt) {
-              throw new ValidationError(`expected array to be unique but found same element at indexes ${seenAt[0]} and ${idx}`);
-            }
-            seenMap.set(elem, [idx]);
-          });
-          return true;
-        });
-      }
-      and(schema) {
-        if (schema instanceof ArrayType) {
-          return new ArrayType(this.schema.and(schema.schema));
-        }
-        return new IntersectionType(this, schema);
-      }
-      coerce(fn) {
-        return new ArrayType(this.schema, {
-          default: this.defaultValue,
-          coerce: fn,
-          predicate: this.predicates || void 0
-        });
-      }
-      withPredicate(fn, errMsg) {
-        return withPredicate(this, { func: fn, errMsg });
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.ArrayType = ArrayType;
-    var TupleType = class extends Type {
-      constructor(schemas, opts) {
-        super();
-        this.schemas = schemas;
-        this.predicates = normalizePredicates(opts === null || opts === void 0 ? void 0 : opts.predicate);
-        this.defaultValue = opts === null || opts === void 0 ? void 0 : opts.default;
-        this[coercionTypeSymbol] = this.defaultValue !== void 0 || schemas.some((schema) => schema[coercionTypeSymbol]);
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        if (!Array.isArray(value)) {
-          throw this.typeError("expected tuple value to be type array but got " + typeOf(value));
-        }
-        if (value.length !== this.schemas.length) {
-          throw this.typeError(`expected tuple length to be ${this.schemas.length} but got ${value.length}`);
-        }
-        const convValue = this[coercionTypeSymbol] ? [] : void 0;
-        for (let i = 0; i < this.schemas.length; i++) {
-          try {
-            if (convValue) {
-              convValue.push(this.schemas[i].parse(value[i]));
-            } else {
-              this.schemas[i].parse(value[i]);
-            }
-          } catch (err) {
-            throw new ValidationError(`error parsing tuple at index ${i}: ${err.message}`);
-          }
-        }
-        if (this.predicates) {
-          applyPredicates(this.predicates, convValue || value);
-        }
-        return convValue || value;
-      }
-      and(schema) {
-        if (schema instanceof TupleType) {
-          const otherSchemaArray = schema.schemas;
-          const nextSchemasArray = [];
-          for (let i = 0; i < Math.max(this.schemas.length, otherSchemaArray.length); i++) {
-            const current = this.schemas[i];
-            const other = otherSchemaArray[i];
-            if (current && other) {
-              nextSchemasArray.push(current.and(other));
-            } else if (current) {
-              nextSchemasArray.push(current);
-            } else {
-              nextSchemasArray.push(other);
-            }
-          }
-          return new TupleType(nextSchemasArray);
-        }
-        return new IntersectionType(this, schema);
-      }
-      withPredicate(fn, errMsg) {
-        return withPredicate(this, { func: fn, errMsg });
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.TupleType = TupleType;
-    var UnionType = class extends Type {
-      constructor(schemas, opts) {
-        super();
-        this.schemas = schemas;
-        this.strict = (opts === null || opts === void 0 ? void 0 : opts.strict) !== false;
-        this.defaultValue = opts === null || opts === void 0 ? void 0 : opts.default;
-        this[coercionTypeSymbol] = (opts === null || opts === void 0 ? void 0 : opts.default) !== void 0 || schemas.some((schema) => schema[coercionTypeSymbol]);
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        const errors = /* @__PURE__ */ new Set();
-        for (const schema of this.schemas) {
-          try {
-            if (this.strict === false && schema instanceof ObjectType) {
-              return schema.parse(value, { allowUnknown: true });
-            }
-            return schema.parse(value);
-          } catch (err) {
-            errors.add(err.message);
-          }
-        }
-        const messages = Array.from(errors);
-        if (messages.length === 1) {
-          throw this.typeError(messages[0]);
-        }
-        throw this.typeError("No union satisfied:\n  " + messages.join("\n  "));
-      }
-      and(schema) {
-        const schemaIntersections = this.schemas.map((x) => x.and(schema));
-        return new UnionType(schemaIntersections, { strict: this.strict });
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-    };
-    exports.UnionType = UnionType;
-    function asUnionType(schema) {
-      if (schema instanceof UnionType) {
-        return schema;
-      }
-      if (schema instanceof IntersectionType && schema._schema instanceof UnionType) {
-        return schema._schema;
-      }
-      return null;
-    }
-    var IntersectionType = class extends Type {
-      constructor(left, right) {
-        super();
-        this.left = left;
-        this.right = right;
-        this[coercionTypeSymbol] = this.left[coercionTypeSymbol] && this.right[coercionTypeSymbol];
-        this[allowUnknownSymbol] = !!(this.left[allowUnknownSymbol] || this.right[allowUnknownSymbol]);
-        if (this.left[shapekeysSymbol] && this.right[shapekeysSymbol]) {
-          this[shapekeysSymbol] = Array.from(/* @__PURE__ */ new Set([...this.left[shapekeysSymbol], ...this.right[shapekeysSymbol]]));
-        }
-        this._schema = (() => {
-          if (this.left instanceof MTypeClass) {
-            this.left.and(this.right);
-          }
-          if (this.right instanceof MTypeClass) {
-            this.right.and(this.left);
-          }
-          const leftUnion = asUnionType(this.left);
-          if (leftUnion) {
-            return leftUnion.and(this.right);
-          }
-          const rightUnion = asUnionType(this.right);
-          if (rightUnion) {
-            return rightUnion.and(this.left);
-          }
-          if (this.left instanceof PartialType) {
-            return new IntersectionType(this.left.schema, this.right);
-          }
-          if (this.right instanceof PartialType) {
-            return new IntersectionType(this.left, this.right.schema);
-          }
-          return null;
-        })();
-      }
-      parse(value, opts) {
-        const allowUnknown = (opts === null || opts === void 0 ? void 0 : opts.allowUnknown) || this[allowUnknownSymbol];
-        if (!allowUnknown && this[shapekeysSymbol]) {
-          const expectedShapeKeys = this[shapekeysSymbol];
-          const invalidKeys = Object.keys(value).filter((key) => !expectedShapeKeys.includes(key));
-          if (invalidKeys.length > 0) {
-            throw this.typeError("unexpected keys on object " + JSON.stringify(invalidKeys));
-          }
-        }
-        if (this._schema) {
-          return this._schema.parse(value, opts);
-        }
-        this.left.parse(value);
-        this.right.parse(value);
-        return value;
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-    };
-    exports.IntersectionType = IntersectionType;
-    var EnumType = class extends Type {
-      constructor(enumeration, opts = {}) {
-        super();
-        this.enumeration = enumeration;
-        this.values = Object.values(enumeration);
-        this.coerceOpt = opts.coerce;
-        this.defaultValue = opts.defaultValue;
-        this[coercionTypeSymbol] = this.defaultValue !== void 0;
-      }
-      parse(value = typeof this.defaultValue === "function" ? this.defaultValue() : this.defaultValue) {
-        let coercedValue = value;
-        if (typeof value === "string" && this.coerceOpt === "lower") {
-          coercedValue = value.toLowerCase();
-        } else if (typeof value === "string" && this.coerceOpt === "upper") {
-          coercedValue = value.toUpperCase();
-        }
-        if (!this.values.includes(coercedValue)) {
-          throw this.typeError(`error ${JSON.stringify(value)} not part of enum values`);
-        }
-        return coercedValue;
-      }
-      check(value) {
-        return this.values.includes(value);
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-      default(value) {
-        return withDefault(this, value);
-      }
-      coerce(opt) {
-        return new EnumType(this.enumeration, { defaultValue: this.defaultValue, coerce: opt });
-      }
-    };
-    exports.EnumType = EnumType;
-    function toPartialSchema(schema, opts) {
-      if (schema instanceof ObjectType) {
-        return schema.partial({ deep: (opts === null || opts === void 0 ? void 0 : opts.deep) || false });
-      }
-      if (schema instanceof IntersectionType) {
-        return new IntersectionType(toPartialSchema(schema.left, opts), toPartialSchema(schema.right, opts));
-      }
-      if (schema instanceof UnionType) {
-        return new UnionType(schema.schemas.map((schema2) => toPartialSchema(schema2, opts)));
-      }
-      if (schema instanceof ArrayType) {
-        if (opts === null || opts === void 0 ? void 0 : opts.deep) {
-          return new ArrayType(toPartialSchema(schema.schema, opts).optional());
-        }
-        return new ArrayType(schema.schema.optional());
-      }
-      return schema;
-    }
-    var PartialType = class extends Type {
-      constructor(schema, opts) {
-        super();
-        this.schema = toPartialSchema(schema, opts);
-        this[coercionTypeSymbol] = this.schema[coercionTypeSymbol];
-      }
-      parse(value) {
-        return this.schema.parse(value);
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-    };
-    exports.PartialType = PartialType;
-    var LazyType = class extends Type {
-      constructor(fn) {
-        super();
-        this.fn = fn;
-        this[coercionTypeSymbol] = true;
-      }
-      parse(value, opts) {
-        const schema = this.fn();
-        if ((opts === null || opts === void 0 ? void 0 : opts.suppressPathErrMsg) && schema instanceof ObjectType) {
-          return schema.parse(value, opts);
-        }
-        return schema.parse(value);
-      }
-      and(schema) {
-        return new IntersectionType(this, schema);
-      }
-    };
-    exports.LazyType = LazyType;
-  }
-});
-
-// node_modules/myzod/libs/index.js
-var require_libs = __commonJS({
-  "node_modules/myzod/libs/index.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.required = exports.enum = exports.null = exports.undefined = exports.omit = exports.pick = exports.partial = exports.lazy = exports.date = exports.tuple = exports.dictionary = exports.record = exports.literals = exports.intersection = exports.union = exports.array = exports.object = exports.literal = exports.unknown = exports.bigint = exports.number = exports.boolean = exports.string = exports.IntersectionType = exports.UnionType = exports.UnknownType = exports.DateType = exports.OptionalType = exports.NullableType = exports.TupleType = exports.ArrayType = exports.ObjectType = exports.NullType = exports.UndefinedType = exports.StringType = exports.BooleanType = exports.NumberType = exports.keySignature = exports.Type = exports.ValidationError = void 0;
-    var types_1 = require_types();
-    var types_2 = require_types();
-    var types_3 = require_types();
-    Object.defineProperty(exports, "ValidationError", { enumerable: true, get: function() {
-      return types_3.ValidationError;
-    } });
-    Object.defineProperty(exports, "Type", { enumerable: true, get: function() {
-      return types_3.Type;
-    } });
-    Object.defineProperty(exports, "keySignature", { enumerable: true, get: function() {
-      return types_3.keySignature;
-    } });
-    Object.defineProperty(exports, "NumberType", { enumerable: true, get: function() {
-      return types_3.NumberType;
-    } });
-    Object.defineProperty(exports, "BooleanType", { enumerable: true, get: function() {
-      return types_3.BooleanType;
-    } });
-    Object.defineProperty(exports, "StringType", { enumerable: true, get: function() {
-      return types_3.StringType;
-    } });
-    Object.defineProperty(exports, "UndefinedType", { enumerable: true, get: function() {
-      return types_3.UndefinedType;
-    } });
-    Object.defineProperty(exports, "NullType", { enumerable: true, get: function() {
-      return types_3.NullType;
-    } });
-    Object.defineProperty(exports, "ObjectType", { enumerable: true, get: function() {
-      return types_3.ObjectType;
-    } });
-    Object.defineProperty(exports, "ArrayType", { enumerable: true, get: function() {
-      return types_3.ArrayType;
-    } });
-    Object.defineProperty(exports, "TupleType", { enumerable: true, get: function() {
-      return types_3.TupleType;
-    } });
-    Object.defineProperty(exports, "NullableType", { enumerable: true, get: function() {
-      return types_3.NullableType;
-    } });
-    Object.defineProperty(exports, "OptionalType", { enumerable: true, get: function() {
-      return types_3.OptionalType;
-    } });
-    Object.defineProperty(exports, "DateType", { enumerable: true, get: function() {
-      return types_3.DateType;
-    } });
-    Object.defineProperty(exports, "UnknownType", { enumerable: true, get: function() {
-      return types_3.UnknownType;
-    } });
-    Object.defineProperty(exports, "UnionType", { enumerable: true, get: function() {
-      return types_3.UnionType;
-    } });
-    Object.defineProperty(exports, "IntersectionType", { enumerable: true, get: function() {
-      return types_3.IntersectionType;
-    } });
-    var string = (opts) => new types_2.StringType(opts);
-    exports.string = string;
-    var boolean = () => new types_2.BooleanType();
-    exports.boolean = boolean;
-    var number = (opts) => new types_2.NumberType(opts);
-    exports.number = number;
-    var bigint = (opts) => new types_2.BigIntType(opts);
-    exports.bigint = bigint;
-    var unknown = () => new types_2.UnknownType();
-    exports.unknown = unknown;
-    var literal = (literal2) => new types_2.LiteralType(literal2);
-    exports.literal = literal;
-    var object = (shape, opts) => new types_2.ObjectType(shape, opts);
-    exports.object = object;
-    var array = (schema, opts) => new types_2.ArrayType(schema, opts);
-    exports.array = array;
-    var union = (schemas, opts) => new types_2.UnionType(schemas, opts);
-    exports.union = union;
-    var intersection = (l, r) => l.and(r);
-    exports.intersection = intersection;
-    var literals = (...args) => new types_2.UnionType(args.map(exports.literal));
-    exports.literals = literals;
-    var record = (schema) => new types_2.ObjectType({ [types_2.keySignature]: schema });
-    exports.record = record;
-    var dictionary = (schema) => {
-      if (schema instanceof types_2.OptionalType) {
-        return new types_2.ObjectType({ [types_2.keySignature]: schema });
-      }
-      return new types_2.ObjectType({ [types_2.keySignature]: new types_2.OptionalType(schema) });
-    };
-    exports.dictionary = dictionary;
-    var tuple = (schemas) => new types_2.TupleType(schemas);
-    exports.tuple = tuple;
-    var date = () => new types_2.DateType();
-    exports.date = date;
-    var lazy = (fn) => new types_2.LazyType(fn);
-    exports.lazy = lazy;
-    function partial(schema, opts) {
-      if (schema instanceof types_2.ObjectType) {
-        return schema.partial(opts);
-      }
-      return new types_2.PartialType(schema, opts);
-    }
-    exports.partial = partial;
-    function pick(schema, keys) {
-      return schema.pick(keys);
-    }
-    exports.pick = pick;
-    function omit(schema, keys) {
-      return schema.omit(keys);
-    }
-    exports.omit = omit;
-    var undefinedValue = () => new types_2.UndefinedType();
-    exports.undefined = undefinedValue;
-    var nullValue = () => new types_2.NullType();
-    exports.null = nullValue;
-    var enumValue = (e, opts) => new types_2.EnumType(e, opts);
-    exports.enum = enumValue;
-    exports.default = {
-      Type: types_2.Type,
-      string: exports.string,
-      boolean: exports.boolean,
-      number: exports.number,
-      bigint: exports.bigint,
-      unknown: exports.unknown,
-      literal: exports.literal,
-      literals: exports.literals,
-      date: exports.date,
-      object: exports.object,
-      array: exports.array,
-      union: exports.union,
-      intersection: exports.intersection,
-      record: exports.record,
-      dictionary: exports.dictionary,
-      tuple: exports.tuple,
-      partial,
-      pick,
-      omit,
-      required,
-      lazy: exports.lazy,
-      undefined: undefinedValue,
-      null: nullValue,
-      enum: enumValue,
-      ValidationError: types_2.ValidationError,
-      keySignature: types_2.keySignature,
-      NumberType: types_2.NumberType,
-      BooleanType: types_2.BooleanType,
-      StringType: types_2.StringType,
-      UndefinedType: types_2.UndefinedType,
-      NullType: types_2.NullType,
-      ObjectType: types_2.ObjectType,
-      ArrayType: types_2.ArrayType,
-      TupleType: types_2.TupleType,
-      NullableType: types_2.NullableType,
-      OptionalType: types_2.OptionalType,
-      DateType: types_2.DateType,
-      UnknownType: types_2.UnknownType,
-      UnionType: types_2.UnionType,
-      IntersectionType: types_1.IntersectionType
-    };
-    function required(schema) {
-      if (schema instanceof types_2.NullableType) {
-        return required(schema.required());
-      }
-      if (schema instanceof types_2.OptionalType) {
-        return required(schema.required());
-      }
-      return schema;
-    }
-    exports.required = required;
-  }
-});
-
 // src/main.ts
-var core = __toESM(require_core());
+var core2 = __toESM(require_core());
 var command = __toESM(require_command());
-var httpClient = __toESM(require_http_client());
-var tc = __toESM(require_tool_cache());
+var import_assert = __toESM(require("assert"));
 var cp = __toESM(require("child_process"));
+
+// src/helpers.ts
+var core = __toESM(require_core());
+var httpClient = __toESM(require_lib());
+var tc = __toESM(require_tool_cache());
 var path = __toESM(require("path"));
-var import_semver = __toESM(require_semver2());
+var import_semver2 = __toESM(require_semver2());
 var import_string_argv = __toESM(require_string_argv());
 
+// package.json
+var version = "1.3.0";
+
+// node_modules/@badrap/valita/dist/node-mjs/index.mjs
+function joinIssues(left, right) {
+  return left ? { code: "join", left, right } : right;
+}
+function prependPath(key, tree) {
+  return { code: "prepend", key, tree };
+}
+function _collectIssues(tree, path2, issues) {
+  var _a;
+  if (tree.code === "join") {
+    _collectIssues(tree.left, path2, issues);
+    _collectIssues(tree.right, path2, issues);
+  } else if (tree.code === "prepend") {
+    path2.push(tree.key);
+    _collectIssues(tree.tree, path2, issues);
+    path2.pop();
+  } else {
+    const finalPath = path2.slice();
+    if (tree.path) {
+      finalPath.push(...tree.path);
+    }
+    if (tree.code === "custom_error" && typeof tree.error !== "string" && ((_a = tree.error) === null || _a === void 0 ? void 0 : _a.path)) {
+      finalPath.push(...tree.error.path);
+    }
+    issues.push(__spreadProps(__spreadValues({}, tree), { path: finalPath }));
+  }
+}
+function collectIssues(tree) {
+  const issues = [];
+  const path2 = [];
+  _collectIssues(tree, path2, issues);
+  return issues;
+}
+function separatedList(list, separator) {
+  if (list.length === 0) {
+    return "nothing";
+  }
+  const last = list[list.length - 1];
+  if (list.length < 2) {
+    return last;
+  }
+  return `${list.slice(0, -1).join(", ")} ${separator} ${last}`;
+}
+function formatLiteral(value) {
+  return typeof value === "bigint" ? `${value}n` : JSON.stringify(value);
+}
+function findOneIssue(tree, path2 = []) {
+  var _a;
+  if (tree.code === "join") {
+    return findOneIssue(tree.left, path2);
+  } else if (tree.code === "prepend") {
+    path2.push(tree.key);
+    return findOneIssue(tree.tree, path2);
+  } else {
+    if (tree.path) {
+      path2.push(...tree.path);
+    }
+    if (tree.code === "custom_error" && typeof tree.error !== "string" && ((_a = tree.error) === null || _a === void 0 ? void 0 : _a.path)) {
+      path2.push(...tree.error.path);
+    }
+    return __spreadProps(__spreadValues({}, tree), { path: path2 });
+  }
+}
+function countIssues(tree) {
+  if (tree.code === "join") {
+    return countIssues(tree.left) + countIssues(tree.right);
+  } else if (tree.code === "prepend") {
+    return countIssues(tree.tree);
+  } else {
+    return 1;
+  }
+}
+function formatIssueTree(issueTree) {
+  const count = countIssues(issueTree);
+  const issue = findOneIssue(issueTree);
+  const path2 = issue.path || [];
+  let message = "validation failed";
+  if (issue.code === "invalid_type") {
+    message = `expected ${separatedList(issue.expected, "or")}`;
+  } else if (issue.code === "invalid_literal") {
+    message = `expected ${separatedList(issue.expected.map(formatLiteral), "or")}`;
+  } else if (issue.code === "missing_value") {
+    message = `missing value`;
+  } else if (issue.code === "unrecognized_keys") {
+    const keys = issue.keys;
+    message = `unrecognized ${keys.length === 1 ? "key" : "keys"} ${separatedList(keys.map(formatLiteral), "and")}`;
+  } else if (issue.code === "invalid_length") {
+    const min = issue.minLength;
+    const max = issue.maxLength;
+    message = `expected an array with `;
+    if (min > 0) {
+      if (max === min) {
+        message += `${min}`;
+      } else if (max < Infinity) {
+        message += `between ${min} and ${max}`;
+      } else {
+        message += `at least ${min}`;
+      }
+    } else {
+      message += `at most ${max}`;
+    }
+    message += ` item(s)`;
+  } else if (issue.code === "custom_error") {
+    const error = issue.error;
+    if (typeof error === "string") {
+      message = error;
+    } else if (error && error.message === "string") {
+      message = error.message;
+    }
+  }
+  let msg = `${issue.code} at .${path2.join(".")} (${message})`;
+  if (count === 2) {
+    msg += ` (+ 1 other issue)`;
+  } else if (count > 2) {
+    msg += ` (+ ${count - 1} other issues)`;
+  }
+  return msg;
+}
+var ValitaError = class extends Error {
+  constructor(issueTree) {
+    super(formatIssueTree(issueTree));
+    Object.setPrototypeOf(this, new.target.prototype);
+    Object.defineProperty(this, "issueTree", { value: issueTree });
+    this.name = new.target.name;
+  }
+  get issues() {
+    const issues = collectIssues(this.issueTree);
+    Object.defineProperty(this, "issues", { value: issues });
+    return issues;
+  }
+};
+var Err = class {
+  constructor(issueTree) {
+    this.issueTree = issueTree;
+    this.ok = false;
+  }
+  get issues() {
+    const issues = collectIssues(this.issueTree);
+    Object.defineProperty(this, "issues", { value: issues });
+    return issues;
+  }
+  get message() {
+    const message = formatIssueTree(this.issueTree);
+    Object.defineProperty(this, "message", { value: message });
+    return message;
+  }
+  throw() {
+    throw new ValitaError(this.issueTree);
+  }
+};
+function isObject(v) {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+function safeSet(obj, key, value) {
+  if (key === "__proto__") {
+    Object.defineProperty(obj, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+}
+function toTerminals(type) {
+  const result = [];
+  type.toTerminals(result);
+  return result;
+}
+function hasTerminal(type, name) {
+  return toTerminals(type).some((t) => t.name === name);
+}
+var Nothing = Symbol();
+var AbstractType = class {
+  get func() {
+    const f = this.genFunc();
+    Object.defineProperty(this, "func", { value: f });
+    return f;
+  }
+  try(v, options) {
+    let mode = 1;
+    if (options && options.mode === "passthrough") {
+      mode = 0;
+    } else if (options && options.mode === "strip") {
+      mode = 2;
+    }
+    const r = this.func(v, mode);
+    if (r === true) {
+      return { ok: true, value: v };
+    } else if (r.code === "ok") {
+      return { ok: true, value: r.value };
+    } else {
+      return new Err(r);
+    }
+  }
+  parse(v, options) {
+    let mode = 1;
+    if (options && options.mode === "passthrough") {
+      mode = 0;
+    } else if (options && options.mode === "strip") {
+      mode = 2;
+    }
+    const r = this.func(v, mode);
+    if (r === true) {
+      return v;
+    } else if (r.code === "ok") {
+      return r.value;
+    } else {
+      throw new ValitaError(r);
+    }
+  }
+  optional() {
+    return new Optional(this);
+  }
+  default(defaultValue) {
+    const defaultResult = { code: "ok", value: defaultValue };
+    return new TransformType(this.optional(), (v) => {
+      return v === void 0 ? defaultResult : true;
+    });
+  }
+  assert(func, error) {
+    const err = { code: "custom_error", error };
+    return new TransformType(this, (v) => func(v) ? true : err);
+  }
+  map(func) {
+    return new TransformType(this, (v) => ({
+      code: "ok",
+      value: func(v)
+    }));
+  }
+  chain(func) {
+    return new TransformType(this, (v) => {
+      const r = func(v);
+      if (r.ok) {
+        return { code: "ok", value: r.value };
+      } else {
+        return r.issueTree;
+      }
+    });
+  }
+};
+var Type = class extends AbstractType {
+};
+var Optional = class extends AbstractType {
+  constructor(type) {
+    super();
+    this.type = type;
+    this.name = "optional";
+  }
+  genFunc() {
+    const func = this.type.func;
+    return (v, mode) => {
+      return v === void 0 || v === Nothing ? true : func(v, mode);
+    };
+  }
+  toTerminals(into) {
+    into.push(this);
+    into.push(undefined_());
+    this.type.toTerminals(into);
+  }
+};
+var ObjectType = class extends Type {
+  constructor(shape, restType, checks) {
+    super();
+    this.shape = shape;
+    this.restType = restType;
+    this.checks = checks;
+    this.name = "object";
+  }
+  toTerminals(into) {
+    into.push(this);
+  }
+  check(func, error) {
+    var _a;
+    const issue = { code: "custom_error", error };
+    return new ObjectType(this.shape, this.restType, [
+      ...(_a = this.checks) !== null && _a !== void 0 ? _a : [],
+      {
+        func,
+        issue
+      }
+    ]);
+  }
+  genFunc() {
+    const shape = this.shape;
+    const checks = this.checks;
+    const requiredKeys = [];
+    const optionalKeys = [];
+    for (const key in shape) {
+      if (hasTerminal(shape[key], "optional")) {
+        optionalKeys.push(key);
+      } else {
+        requiredKeys.push(key);
+      }
+    }
+    const requiredCount = requiredKeys.length | 0;
+    const optionalCount = optionalKeys.length | 0;
+    const totalCount = requiredCount + optionalCount | 0;
+    const keys = [...requiredKeys, ...optionalKeys];
+    const funcs = keys.map((key) => shape[key].func);
+    const invertedIndexes = /* @__PURE__ */ Object.create(null);
+    keys.forEach((key, index) => {
+      invertedIndexes[key] = ~index;
+    });
+    const invalidType = { code: "invalid_type", expected: ["object"] };
+    const missingValues = requiredKeys.map((key) => ({
+      code: "missing_value",
+      path: [key]
+    }));
+    const assignEnumerable = (to, from) => {
+      for (const key in from) {
+        safeSet(to, key, from[key]);
+      }
+      return to;
+    };
+    const assignKnown = (to, from) => {
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const value = from[key];
+        if (i < requiredCount || value !== void 0 || key in from) {
+          safeSet(to, key, value);
+        }
+      }
+      return to;
+    };
+    const assignAll = (to, from) => {
+      return assignKnown(assignEnumerable(to, from), from);
+    };
+    const addResult = (objResult, func, obj, key, value, mode, assign) => {
+      const keyResult = func(value, mode);
+      if (keyResult === true) {
+        if (objResult !== true && objResult.code === "ok" && value !== Nothing) {
+          safeSet(objResult.value, key, value);
+        }
+        return objResult;
+      } else if (keyResult.code === "ok") {
+        if (objResult === true) {
+          const copy = assign({}, obj);
+          safeSet(copy, key, keyResult.value);
+          return { code: "ok", value: copy };
+        } else if (objResult.code === "ok") {
+          safeSet(objResult.value, key, keyResult.value);
+          return objResult;
+        } else {
+          return objResult;
+        }
+      } else {
+        return prependIssue(prependPath(key, keyResult), objResult);
+      }
+    };
+    const prependIssue = (issue, result) => {
+      return result === true || result.code === "ok" ? issue : joinIssues(issue, result);
+    };
+    const checkRemainingKeys = (initialResult, obj, mode, requiredSeen, optionalSeen, seenIndexes, assign) => {
+      let result = initialResult;
+      const start = requiredSeen < requiredCount ? 0 : requiredCount;
+      const end = optionalSeen < optionalCount ? totalCount : requiredCount;
+      for (let i = start | 0; i < (end | 0); i = i + 1 | 0) {
+        if (i >= 32 || !(seenIndexes & 1 << i)) {
+          const key = keys[i];
+          if (key in obj) {
+            if (i < 32 || !Object.prototype.propertyIsEnumerable.call(obj, key)) {
+              result = addResult(result, funcs[i], obj, key, obj[key], mode, assign);
+            }
+          } else if (i >= requiredCount) {
+            result = addResult(result, funcs[i], obj, key, Nothing, mode, assign);
+          } else {
+            result = prependIssue(missingValues[i], result);
+          }
+        }
+      }
+      return result;
+    };
+    const strict = (obj, mode) => {
+      let result = true;
+      let requiredSeen = 0 | 0;
+      let optionalSeen = 0 | 0;
+      let seenIndexes = 0 | 0;
+      let unrecognized = void 0;
+      for (const key in obj) {
+        const value = obj[key];
+        const index = ~invertedIndexes[key] | 0;
+        if (index >= 0) {
+          if (index < requiredCount) {
+            requiredSeen = requiredSeen + 1 | 0;
+          } else {
+            optionalSeen = optionalSeen + 1 | 0;
+          }
+          if (index < 32) {
+            seenIndexes = seenIndexes | 1 << index;
+          }
+          if (index < 32 || Object.prototype.hasOwnProperty.call(obj, key)) {
+            result = addResult(result, funcs[index], obj, key, value, mode, assignKnown);
+          }
+        } else if (mode === 2) {
+          result = result === true ? { code: "ok", value: assignKnown({}, obj) } : result;
+        } else if (unrecognized === void 0) {
+          unrecognized = [key];
+        } else {
+          unrecognized.push(key);
+        }
+      }
+      if (requiredSeen + optionalSeen < totalCount) {
+        result = checkRemainingKeys(result, obj, mode, requiredSeen, optionalSeen, seenIndexes, assignKnown);
+      }
+      return unrecognized === void 0 ? result : prependIssue({
+        code: "unrecognized_keys",
+        keys: unrecognized
+      }, result);
+    };
+    const pass = (obj, mode) => {
+      let result = true;
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        let value = obj[key];
+        if (value === void 0 && !(key in obj)) {
+          if (i < requiredCount) {
+            result = prependIssue(missingValues[i], result);
+            continue;
+          }
+          value = Nothing;
+        }
+        result = addResult(result, funcs[i], obj, key, value, mode, assignKnown);
+      }
+      return result;
+    };
+    const runChecks = (obj, result) => {
+      if ((result === true || result.code === "ok") && checks) {
+        const value = result === true ? obj : result.value;
+        for (let i = 0; i < checks.length; i++) {
+          if (!checks[i].func(value)) {
+            return checks[i].issue;
+          }
+        }
+      }
+      return result;
+    };
+    if (this.restType) {
+      const rest = this.restType.func;
+      if (rest.name === "unknown") {
+        if (totalCount === 0) {
+          return (obj, _mode) => {
+            return isObject(obj) ? runChecks(obj, true) : invalidType;
+          };
+        }
+        return (obj, mode) => {
+          return isObject(obj) ? runChecks(obj, pass(obj, mode)) : invalidType;
+        };
+      }
+      return (obj, mode) => {
+        if (!isObject(obj)) {
+          return invalidType;
+        }
+        let result = true;
+        let requiredSeen = 0 | 0;
+        let optionalSeen = 0 | 0;
+        let seenIndexes = 0 | 0;
+        for (const key in obj) {
+          const value = obj[key];
+          const index = ~invertedIndexes[key] | 0;
+          if (index >= 0) {
+            if (index < requiredCount) {
+              requiredSeen = requiredSeen + 1 | 0;
+            } else {
+              optionalSeen = optionalSeen + 1 | 0;
+            }
+            if (index < 32) {
+              seenIndexes = seenIndexes | 1 << index;
+            }
+            if (index < 32 || Object.prototype.hasOwnProperty.call(obj, key)) {
+              result = addResult(result, funcs[index], obj, key, value, mode, assignEnumerable);
+            }
+          } else {
+            result = addResult(result, rest, obj, key, value, mode, assignEnumerable);
+          }
+        }
+        if (requiredSeen + optionalSeen < totalCount) {
+          result = checkRemainingKeys(result, obj, mode, requiredSeen, optionalSeen, seenIndexes, assignAll);
+        }
+        return runChecks(obj, result);
+      };
+    }
+    return (obj, mode) => {
+      if (!isObject(obj)) {
+        return invalidType;
+      }
+      return runChecks(obj, mode === 0 ? pass(obj, mode) : strict(obj, mode));
+    };
+  }
+  rest(restType) {
+    return new ObjectType(this.shape, restType);
+  }
+  extend(shape) {
+    return new ObjectType(__spreadValues(__spreadValues({}, this.shape), shape), this.restType);
+  }
+  pick(...keys) {
+    const shape = {};
+    keys.forEach((key) => {
+      shape[key] = this.shape[key];
+    });
+    return new ObjectType(shape, void 0);
+  }
+  omit(...keys) {
+    const shape = __spreadValues({}, this.shape);
+    keys.forEach((key) => {
+      delete shape[key];
+    });
+    return new ObjectType(shape, this.restType);
+  }
+  partial() {
+    var _a;
+    const shape = {};
+    Object.keys(this.shape).forEach((key) => {
+      shape[key] = this.shape[key].optional();
+    });
+    const rest = (_a = this.restType) === null || _a === void 0 ? void 0 : _a.optional();
+    return new ObjectType(shape, rest);
+  }
+};
+var ArrayType = class extends Type {
+  constructor(head, rest) {
+    super();
+    this.head = head;
+    this.rest = rest;
+    this.name = "array";
+  }
+  toTerminals(into) {
+    into.push(this);
+  }
+  genFunc() {
+    var _a;
+    const headFuncs = this.head.map((t) => t.func);
+    const restFunc = ((_a = this.rest) !== null && _a !== void 0 ? _a : never()).func;
+    const minLength = headFuncs.length;
+    const maxLength = this.rest ? Infinity : minLength;
+    const invalidType = { code: "invalid_type", expected: ["array"] };
+    const invalidLength = {
+      code: "invalid_length",
+      minLength,
+      maxLength
+    };
+    return (arr, mode) => {
+      if (!Array.isArray(arr)) {
+        return invalidType;
+      }
+      const length = arr.length;
+      if (length < minLength || length > maxLength) {
+        return invalidLength;
+      }
+      let issueTree = void 0;
+      let output = arr;
+      for (let i = 0; i < arr.length; i++) {
+        const func = i < minLength ? headFuncs[i] : restFunc;
+        const r = func(arr[i], mode);
+        if (r !== true) {
+          if (r.code === "ok") {
+            if (output === arr) {
+              output = arr.slice();
+            }
+            output[i] = r.value;
+          } else {
+            issueTree = joinIssues(issueTree, prependPath(i, r));
+          }
+        }
+      }
+      if (issueTree) {
+        return issueTree;
+      } else if (arr === output) {
+        return true;
+      } else {
+        return { code: "ok", value: output };
+      }
+    };
+  }
+};
+function toBaseType(v) {
+  const type = typeof v;
+  if (type !== "object") {
+    return type;
+  } else if (v === null) {
+    return "null";
+  } else if (Array.isArray(v)) {
+    return "array";
+  } else {
+    return type;
+  }
+}
+function dedup(arr) {
+  const output = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (let i = 0; i < arr.length; i++) {
+    if (!seen.has(arr[i])) {
+      output.push(arr[i]);
+      seen.add(arr[i]);
+    }
+  }
+  return output;
+}
+function findCommonKeys(rs) {
+  const map = /* @__PURE__ */ new Map();
+  rs.forEach((r) => {
+    for (const key in r) {
+      map.set(key, (map.get(key) || 0) + 1);
+    }
+  });
+  const result = [];
+  map.forEach((count, key) => {
+    if (count === rs.length) {
+      result.push(key);
+    }
+  });
+  return result;
+}
+function createObjectMatchers(t) {
+  const objects = [];
+  t.forEach(({ root, terminal }) => {
+    if (terminal.name === "object") {
+      objects.push({ root, terminal });
+    }
+  });
+  const shapes = objects.map(({ terminal }) => terminal.shape);
+  const common = findCommonKeys(shapes);
+  const discriminants = common.filter((key) => {
+    const types = /* @__PURE__ */ new Map();
+    const literals = /* @__PURE__ */ new Map();
+    let optionals = [];
+    let unknowns = [];
+    for (let i = 0; i < shapes.length; i++) {
+      const shape = shapes[i];
+      const terminals = toTerminals(shape[key]);
+      for (let j = 0; j < terminals.length; j++) {
+        const terminal = terminals[j];
+        if (terminal.name === "never") {
+        } else if (terminal.name === "unknown") {
+          unknowns.push(i);
+        } else if (terminal.name === "optional") {
+          optionals.push(i);
+        } else if (terminal.name === "literal") {
+          const options = literals.get(terminal.value) || [];
+          options.push(i);
+          literals.set(terminal.value, options);
+        } else {
+          const options = types.get(terminal.name) || [];
+          options.push(i);
+          types.set(terminal.name, options);
+        }
+      }
+    }
+    optionals = dedup(optionals);
+    if (optionals.length > 1) {
+      return false;
+    }
+    unknowns = dedup(unknowns);
+    if (unknowns.length > 1) {
+      return false;
+    }
+    literals.forEach((found, value) => {
+      const options = types.get(toBaseType(value));
+      if (options) {
+        options.push(...found);
+        literals.delete(value);
+      }
+    });
+    let success = true;
+    literals.forEach((found) => {
+      if (dedup(found.concat(unknowns)).length > 1) {
+        success = false;
+      }
+    });
+    types.forEach((found) => {
+      if (dedup(found.concat(unknowns)).length > 1) {
+        success = false;
+      }
+    });
+    return success;
+  });
+  return discriminants.map((key) => {
+    const flattened = flatten(objects.map(({ root, terminal }) => ({
+      root,
+      type: terminal.shape[key]
+    })));
+    let optional = void 0;
+    for (let i = 0; i < flattened.length; i++) {
+      const { root, terminal } = flattened[i];
+      if (terminal.name === "optional") {
+        optional = root;
+        break;
+      }
+    }
+    return {
+      key,
+      optional,
+      matcher: createUnionMatcher(flattened, [key])
+    };
+  });
+}
+function createUnionMatcher(t, path2) {
+  const order = /* @__PURE__ */ new Map();
+  t.forEach(({ root }, i) => {
+    var _a;
+    order.set(root, (_a = order.get(root)) !== null && _a !== void 0 ? _a : i);
+  });
+  const byOrder = (a, b) => {
+    var _a, _b;
+    return ((_a = order.get(a)) !== null && _a !== void 0 ? _a : 0) - ((_b = order.get(b)) !== null && _b !== void 0 ? _b : 0);
+  };
+  const expectedTypes = [];
+  const literals = /* @__PURE__ */ new Map();
+  const types = /* @__PURE__ */ new Map();
+  let unknowns = [];
+  let optionals = [];
+  t.forEach(({ root, terminal }) => {
+    if (terminal.name === "never") {
+    } else if (terminal.name === "optional") {
+      optionals.push(root);
+    } else if (terminal.name === "unknown") {
+      unknowns.push(root);
+    } else if (terminal.name === "literal") {
+      const roots = literals.get(terminal.value) || [];
+      roots.push(root);
+      literals.set(terminal.value, roots);
+      expectedTypes.push(toBaseType(terminal.value));
+    } else {
+      const roots = types.get(terminal.name) || [];
+      roots.push(root);
+      types.set(terminal.name, roots);
+      expectedTypes.push(terminal.name);
+    }
+  });
+  literals.forEach((roots, value) => {
+    const options = types.get(toBaseType(value));
+    if (options) {
+      options.push(...roots);
+      literals.delete(value);
+    }
+  });
+  unknowns = dedup(unknowns).sort(byOrder);
+  optionals = dedup(optionals).sort(byOrder);
+  types.forEach((roots, type) => types.set(type, dedup(roots.concat(unknowns).sort(byOrder))));
+  literals.forEach((roots, value) => literals.set(value, dedup(roots.concat(unknowns)).sort(byOrder)));
+  const expectedLiterals = [];
+  literals.forEach((_, value) => {
+    expectedLiterals.push(value);
+  });
+  const invalidType = {
+    code: "invalid_type",
+    path: path2,
+    expected: dedup(expectedTypes)
+  };
+  const invalidLiteral = {
+    code: "invalid_literal",
+    path: path2,
+    expected: expectedLiterals
+  };
+  const missingValue = {
+    code: "missing_value",
+    path: path2
+  };
+  const literalTypes = new Set(expectedLiterals.map(toBaseType));
+  return (rootValue, value, mode) => {
+    let count = 0;
+    let issueTree;
+    if (value === Nothing) {
+      for (let i = 0; i < optionals.length; i++) {
+        const r = optionals[i].func(rootValue, mode);
+        if (r === true || r.code === "ok") {
+          return r;
+        }
+        issueTree = joinIssues(issueTree, r);
+        count++;
+      }
+      if (!issueTree) {
+        return missingValue;
+      } else if (count > 1) {
+        return { code: "invalid_union", tree: issueTree };
+      } else {
+        return issueTree;
+      }
+    }
+    const type = toBaseType(value);
+    const options = literals.get(value) || types.get(type) || unknowns;
+    for (let i = 0; i < options.length; i++) {
+      const r = options[i].func(rootValue, mode);
+      if (r === true || r.code === "ok") {
+        return r;
+      }
+      issueTree = joinIssues(issueTree, r);
+      count++;
+    }
+    if (!issueTree) {
+      return literalTypes.has(type) ? invalidLiteral : invalidType;
+    } else if (count > 1) {
+      return { code: "invalid_union", tree: issueTree };
+    } else {
+      return issueTree;
+    }
+  };
+}
+function flatten(t) {
+  const result = [];
+  t.forEach(({ root, type }) => toTerminals(type).forEach((terminal) => {
+    result.push({ root, terminal });
+  }));
+  return result;
+}
+var UnionType = class extends Type {
+  constructor(options) {
+    super();
+    this.options = options;
+    this.name = "union";
+  }
+  toTerminals(into) {
+    this.options.forEach((o) => o.toTerminals(into));
+  }
+  genFunc() {
+    const flattened = flatten(this.options.map((root) => ({ root, type: root })));
+    const hasUnknown = hasTerminal(this, "unknown");
+    const objects = createObjectMatchers(flattened);
+    const base = createUnionMatcher(flattened);
+    return (v, mode) => {
+      if (!hasUnknown && objects.length > 0 && isObject(v)) {
+        const item = objects[0];
+        let value = v[item.key];
+        if (value === void 0 && !(item.key in v)) {
+          value = Nothing;
+        }
+        return item.matcher(v, value, mode);
+      }
+      return base(v, v, mode);
+    };
+  }
+  optional() {
+    return new Optional(this);
+  }
+};
+var LiteralType = class extends Type {
+  constructor(value) {
+    super();
+    this.value = value;
+    this.name = "literal";
+  }
+  genFunc() {
+    const value = this.value;
+    const issue = { code: "invalid_literal", expected: [value] };
+    return (v, _) => v === value ? true : issue;
+  }
+  toTerminals(into) {
+    into.push(this);
+  }
+};
+var TransformType = class extends Type {
+  constructor(transformed, transform) {
+    super();
+    this.transformed = transformed;
+    this.transform = transform;
+    this.name = "transform";
+  }
+  genFunc() {
+    const chain = [];
+    let next = this;
+    while (next instanceof TransformType) {
+      chain.push(next.transform);
+      next = next.transformed;
+    }
+    chain.reverse();
+    const func = next.func;
+    const undef = { code: "ok", value: void 0 };
+    return (v, mode) => {
+      let result = func(v, mode);
+      if (result !== true && result.code !== "ok") {
+        return result;
+      }
+      let current;
+      if (result !== true) {
+        current = result.value;
+      } else if (v === Nothing) {
+        current = void 0;
+        result = undef;
+      } else {
+        current = v;
+      }
+      for (let i = 0; i < chain.length; i++) {
+        const r = chain[i](current, mode);
+        if (r !== true) {
+          if (r.code !== "ok") {
+            return r;
+          }
+          current = r.value;
+          result = r;
+        }
+      }
+      return result;
+    };
+  }
+  toTerminals(into) {
+    this.transformed.toTerminals(into);
+  }
+};
+function singleton(name, genFunc) {
+  class Singleton extends Type {
+    constructor() {
+      super(...arguments);
+      this.name = name;
+    }
+    genFunc() {
+      return genFunc();
+    }
+    toTerminals(into) {
+      into.push(this);
+    }
+  }
+  const instance = new Singleton();
+  return () => instance;
+}
+var never = singleton("never", () => {
+  const issue = { code: "invalid_type", expected: [] };
+  return (_v, _mode) => issue;
+});
+var unknown = singleton("unknown", () => {
+  return (_v, _mode) => true;
+});
+var number = singleton("number", () => {
+  const issue = { code: "invalid_type", expected: ["number"] };
+  return (v, _mode) => typeof v === "number" ? true : issue;
+});
+var bigint = singleton("bigint", () => {
+  const issue = { code: "invalid_type", expected: ["bigint"] };
+  return (v, _mode) => typeof v === "bigint" ? true : issue;
+});
+var string = singleton("string", () => {
+  const issue = { code: "invalid_type", expected: ["string"] };
+  return (v, _mode) => typeof v === "string" ? true : issue;
+});
+var boolean = singleton("boolean", () => {
+  const issue = { code: "invalid_type", expected: ["boolean"] };
+  return (v, _mode) => typeof v === "boolean" ? true : issue;
+});
+var undefined_ = singleton("undefined", () => {
+  const issue = { code: "invalid_type", expected: ["undefined"] };
+  return (v, _mode) => v === void 0 ? true : issue;
+});
+var null_ = singleton("null", () => {
+  const issue = { code: "invalid_type", expected: ["null"] };
+  return (v, _mode) => v === null ? true : issue;
+});
+function literal(value) {
+  return new LiteralType(value);
+}
+function object(obj) {
+  return new ObjectType(obj, void 0);
+}
+function array(item) {
+  return new ArrayType([], item);
+}
+function union(...options) {
+  return new UnionType(options);
+}
+
 // src/schema.ts
-var import_myzod = __toESM(require_libs());
-var Position = import_myzod.default.object({
-  line: import_myzod.default.number(),
-  character: import_myzod.default.number()
+var import_semver = __toESM(require_semver2());
+var Position = object({
+  line: number(),
+  character: number()
 });
 function isEmptyPosition(p) {
   return p.line === 0 && p.character === 0;
 }
-var Range = import_myzod.default.object({
+var Range = object({
   start: Position,
   end: Position
 });
 function isEmptyRange(r) {
   return isEmptyPosition(r.start) && isEmptyPosition(r.end);
 }
-var Diagnostic = import_myzod.default.object({
-  file: import_myzod.default.string(),
-  severity: import_myzod.default.literals("error", "warning", "information"),
-  message: import_myzod.default.string(),
-  rule: import_myzod.default.string().optional(),
+var Diagnostic = object({
+  file: string(),
+  severity: union(literal("error"), literal("warning"), literal("information")),
+  message: string(),
+  rule: string().optional(),
   range: Range.optional()
 });
-var Report = import_myzod.default.object({
-  version: import_myzod.default.string(),
-  time: import_myzod.default.string(),
-  generalDiagnostics: import_myzod.default.array(Diagnostic),
-  summary: import_myzod.default.object({
-    filesAnalyzed: import_myzod.default.number(),
-    errorCount: import_myzod.default.number(),
-    warningCount: import_myzod.default.number(),
-    informationCount: import_myzod.default.number(),
-    timeInSec: import_myzod.default.number()
+var Report = object({
+  generalDiagnostics: array(Diagnostic),
+  summary: object({
+    errorCount: number(),
+    warningCount: number(),
+    informationCount: number()
   })
 });
-
-// src/main.ts
-async function main() {
+function parseReport(v) {
+  return Report.parse(v, { mode: "strip" });
+}
+function isSemVer(version2) {
   try {
-    const cwd = core.getInput("working-directory");
-    if (cwd) {
-      process.chdir(cwd);
-    }
-    const version = await getVersion();
-    console.log(`pyright ${version}`);
-    const { args, noComments, treatPartialAsWarning } = await getArgs(version);
-    if (noComments) {
-      const { status: status2 } = cp.spawnSync(process.execPath, args, {
-        stdio: ["ignore", "inherit", "inherit"]
-      });
-      if (status2 !== 0) {
-        core.setFailed(`Exit code ${status2}`);
-      }
-      return;
-    }
-    let { status, stdout } = cp.spawnSync(process.execPath, args, {
-      encoding: "utf-8",
-      stdio: ["ignore", "pipe", "inherit"]
-    });
-    if (!stdout.trim()) {
-      core.setFailed(`Exit code ${status}`);
-      return;
-    }
-    const report = Report.parse(JSON.parse(stdout));
-    let { errorCount, warningCount, informationCount } = report.summary;
-    report.generalDiagnostics.forEach((diag) => {
-      var _a, _b, _c, _d;
-      if (treatPartialAsWarning && diag.severity === "error") {
-        if (diag.message.includes("partially unknown")) {
-          diag.severity = "warning";
-          errorCount -= 1;
-          warningCount += 1;
-          if (errorCount === 0) {
-            status = 0;
-          }
-        }
-      }
-      console.log(diagnosticToString(diag, false));
-      if (diag.severity === "information") {
-        return;
-      }
-      const line = (_b = (_a = diag.range) == null ? void 0 : _a.start.line) != null ? _b : 0;
-      const col = (_d = (_c = diag.range) == null ? void 0 : _c.start.character) != null ? _d : 0;
-      const message = diagnosticToString(diag, true);
-      command.issueCommand(diag.severity, {
-        file: diag.file,
-        line: line + 1,
-        col: col + 1
-      }, message);
-    });
-    console.log(`${errorCount} ${errorCount === 1 ? "error" : "errors"}, ${warningCount} ${warningCount === 1 ? "warning" : "warnings"}, ${informationCount} ${informationCount === 1 ? "info" : "infos"} `);
-    if (status !== 0) {
-      core.setFailed(`${errorCount} ${errorCount === 1 ? "error" : "errors"}`);
-    }
-  } catch (e) {
-    core.setFailed(e.message);
+    new import_semver.default(version2);
+    return true;
+  } catch {
+    return false;
   }
 }
-async function getVersion() {
-  const versionSpec = core.getInput("version");
-  if (versionSpec) {
-    return new import_semver.default(versionSpec);
-  }
-  const client = new httpClient.HttpClient();
-  const resp = await client.get("https://registry.npmjs.org/pyright/latest");
-  const body = await resp.readBody();
-  const obj = JSON.parse(body);
-  return new import_semver.default(obj.version);
+var NpmRegistryResponse = object({
+  version: string().assert(isSemVer, "must be a semver"),
+  dist: object({
+    tarball: string()
+  })
+});
+function parseNpmRegistryResponse(v) {
+  return NpmRegistryResponse.parse(v, { mode: "strip" });
 }
-async function getArgs(version) {
-  const pyrightIndex = await getPyright(version);
-  const args = [pyrightIndex];
+
+// src/helpers.ts
+function getActionVersion() {
+  return version;
+}
+function getNodeInfo() {
+  return {
+    version: process.version,
+    execPath: process.execPath
+  };
+}
+async function getArgs() {
+  const pyrightInfo = await getPyrightInfo();
+  const pyrightPath = await downloadPyright(pyrightInfo);
+  const args = [path.join(pyrightPath, "package", "index.js")];
+  const workingDirectory = core.getInput("working-directory");
   const noComments = getBooleanInput("no-comments", false);
   if (!noComments) {
     args.push("--outputjson");
   }
+  const treatPartialAsWarning = getBooleanInput("warn-partial", false);
   const pythonPlatform = core.getInput("python-platform");
   if (pythonPlatform) {
     args.push("--pythonplatform");
@@ -6303,15 +6129,21 @@ async function getArgs(version) {
   if (warnings) {
     args.push("--warnings");
   }
+  const verifyTypes = core.getInput("verify-types");
+  if (verifyTypes) {
+    args.push("--verifytypes");
+    args.push(verifyTypes);
+  }
   const extraArgs = core.getInput("extra-args");
   if (extraArgs) {
     args.push(...(0, import_string_argv.default)(extraArgs));
   }
-  const treatPartialAsWarning = getBooleanInput("warn-partial", false);
   return {
-    args,
+    workingDirectory,
     noComments,
-    treatPartialAsWarning
+    treatPartialAsWarning,
+    pyrightVersion: pyrightInfo.version,
+    args
   };
 }
 function getBooleanInput(name, defaultValue) {
@@ -6321,11 +6153,100 @@ function getBooleanInput(name, defaultValue) {
   }
   return input.toUpperCase() === "TRUE";
 }
-async function getPyright(version) {
-  const url = `https://registry.npmjs.org/pyright/-/pyright-${version.format()}.tgz`;
-  const pyrightTarball = await tc.downloadTool(url);
-  const pyright = await tc.extractTar(pyrightTarball);
-  return path.join(pyright, "package", "index.js");
+var pyrightToolName = "pyright";
+async function downloadPyright(info2) {
+  const found = tc.find(pyrightToolName, info2.version);
+  if (found) {
+    return found;
+  }
+  const tarballPath = await tc.downloadTool(info2.dist.tarball);
+  const extractedPath = await tc.extractTar(tarballPath);
+  return await tc.cacheDir(extractedPath, pyrightToolName, info2.version);
+}
+async function getPyrightInfo() {
+  const version2 = getPyrightVersion();
+  const client = new httpClient.HttpClient();
+  const resp = await client.get(`https://registry.npmjs.org/pyright/${version2}`);
+  const body = await resp.readBody();
+  if (resp.message.statusCode !== httpClient.HttpCodes.OK) {
+    throw new Error(body);
+  }
+  return parseNpmRegistryResponse(JSON.parse(body));
+}
+function getPyrightVersion() {
+  const versionSpec = core.getInput("version");
+  if (versionSpec) {
+    return new import_semver2.default(versionSpec).format();
+  }
+  return "latest";
+}
+
+// src/main.ts
+async function main() {
+  try {
+    const node = getNodeInfo();
+    const { workingDirectory, noComments, treatPartialAsWarning, pyrightVersion, args } = await getArgs();
+    if (workingDirectory) {
+      process.chdir(workingDirectory);
+    }
+    core2.info(`pyright ${pyrightVersion}, node ${node.version}, pyright-action ${getActionVersion()}`);
+    core2.info(`${node.execPath} ${args.join(" ")}`);
+    if (noComments || args.includes("--verifytypes")) {
+      const { status: status2 } = cp.spawnSync(node.execPath, args, {
+        stdio: ["ignore", "inherit", "inherit"]
+      });
+      if (status2 !== 0) {
+        core2.setFailed(`Exit code ${status2}`);
+      }
+      return;
+    }
+    let { status, stdout } = cp.spawnSync(process.execPath, args, {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "inherit"]
+    });
+    if (!stdout.trim()) {
+      core2.setFailed(`Exit code ${status}`);
+      return;
+    }
+    const report = parseReport(JSON.parse(stdout));
+    let { errorCount, warningCount, informationCount } = report.summary;
+    report.generalDiagnostics.forEach((diag) => {
+      var _a, _b;
+      if (treatPartialAsWarning && diag.severity === "error") {
+        if (diag.message.includes("partially unknown")) {
+          diag.severity = "warning";
+          errorCount -= 1;
+          warningCount += 1;
+          if (errorCount === 0) {
+            status = 0;
+          }
+        }
+      }
+      core2.info(diagnosticToString(diag, false));
+      if (diag.severity === "information") {
+        return;
+      }
+      const line = ((_a = diag.range) == null ? void 0 : _a.start.line) ?? 0;
+      const col = ((_b = diag.range) == null ? void 0 : _b.start.character) ?? 0;
+      const message = diagnosticToString(diag, true);
+      command.issueCommand(diag.severity, {
+        file: diag.file,
+        line: line + 1,
+        col: col + 1
+      }, message);
+    });
+    core2.info([
+      pluralize(errorCount, "error", "errors"),
+      pluralize(warningCount, "warning", "warnings"),
+      pluralize(informationCount, "information", "informations")
+    ].join(", "));
+    if (status !== 0) {
+      core2.setFailed(pluralize(errorCount, "error", "errors"));
+    }
+  } catch (e) {
+    (0, import_assert.default)(typeof e === "string" || e instanceof Error);
+    core2.setFailed(e);
+  }
 }
 function diagnosticToString(diag, forCommand) {
   let message = "";
@@ -6334,10 +6255,9 @@ function diagnosticToString(diag, forCommand) {
       message += `${diag.file}:`;
     }
     if (diag.range && !isEmptyRange(diag.range)) {
-      message += `${diag.range.start.line + 1}:${diag.range.start.character + 1} - `;
+      message += `${diag.range.start.line + 1}:${diag.range.start.character + 1} -`;
     }
-    message += diag.severity === "information" ? "info" : diag.severity;
-    message += `: `;
+    message += ` ${diag.severity}: `;
   }
   message += diag.message;
   if (diag.rule) {
@@ -6345,6 +6265,9 @@ function diagnosticToString(diag, forCommand) {
   }
   return message;
 }
+function pluralize(n, singular, plural) {
+  return `${n} ${n === 1 ? singular : plural}`;
+}
 
 // src/index.ts
-main();
+void main();

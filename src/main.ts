@@ -1,34 +1,37 @@
 import * as core from '@actions/core';
 import * as command from '@actions/core/lib/command';
-import * as httpClient from '@actions/http-client';
-import * as tc from '@actions/tool-cache';
+import assert from 'assert';
 import * as cp from 'child_process';
-import * as path from 'path';
-import SemVer from 'semver/classes/semver';
-import stringArgv from 'string-argv';
 
-import { Diagnostic, isEmptyRange, Report } from './schema';
+import { getActionVersion, getArgs, getNodeInfo } from './helpers';
+import { Diagnostic, isEmptyRange, parseReport } from './schema';
 
 export async function main() {
     try {
-        const cwd = core.getInput('working-directory');
-        if (cwd) {
-            process.chdir(cwd);
+        const node = getNodeInfo();
+        const { workingDirectory, noComments, treatPartialAsWarning, pyrightVersion, args } = await getArgs();
+        if (workingDirectory) {
+            process.chdir(workingDirectory);
         }
 
-        const version = await getVersion();
-        console.log(`pyright ${version}`);
+        core.info(`pyright ${pyrightVersion}, node ${node.version}, pyright-action ${getActionVersion()}`);
+        core.info(`${node.execPath} ${args.join(' ')}`);
 
-        const { args, noComments, treatPartialAsWarning } = await getArgs(version);
-
-        if (noComments) {
-            // Comments are disabled, just run as a subprocess passing things through.
-            const { status } = cp.spawnSync(process.execPath, args, {
+        // We check for --verifytypes as an arg instead of a flag because it may have
+        // been passed via extra-args.
+        if (noComments || args.includes('--verifytypes')) {
+            // If comments are disabled, there's no point in directly processing the output,
+            // as it's only used for comments.
+            // If we're running the type verifier, there's no guarantee that we can even act
+            // on the output besides the exit code.
+            //
+            // So, in either case, just directly run pyright and exit with its status.
+            const { status } = cp.spawnSync(node.execPath, args, {
                 stdio: ['ignore', 'inherit', 'inherit'],
             });
 
             if (status !== 0) {
-                core.setFailed(`Exit code ${status}`);
+                core.setFailed(`Exit code ${status!}`);
             }
             return;
         }
@@ -40,11 +43,11 @@ export async function main() {
 
         if (!stdout.trim()) {
             // Process crashed. stderr was inherited, so just mark the step as failed.
-            core.setFailed(`Exit code ${status}`);
+            core.setFailed(`Exit code ${status!}`);
             return;
         }
 
-        const report = Report.parse(JSON.parse(stdout));
+        const report = parseReport(JSON.parse(stdout));
         let { errorCount, warningCount, informationCount } = report.summary;
 
         report.generalDiagnostics.forEach((diag) => {
@@ -59,7 +62,7 @@ export async function main() {
                 }
             }
 
-            console.log(diagnosticToString(diag, /* forCommand */ false));
+            core.info(diagnosticToString(diag, /* forCommand */ false));
 
             if (diag.severity === 'information') {
                 return;
@@ -69,7 +72,7 @@ export async function main() {
             const col = diag.range?.start.character ?? 0;
             const message = diagnosticToString(diag, /* forCommand */ true);
 
-            // This is technically a log line and duplicates the console.log above,
+            // This is technically a log line and duplicates the core.info above,
             // but we want to have the below look nice in commit comments.
             command.issueCommand(
                 diag.severity,
@@ -82,112 +85,21 @@ export async function main() {
             );
         });
 
-        console.log(
-            `${errorCount} ${errorCount === 1 ? 'error' : 'errors'}, ` +
-                `${warningCount} ${warningCount === 1 ? 'warning' : 'warnings'}, ` +
-                `${informationCount} ${informationCount === 1 ? 'info' : 'infos'} `
+        core.info(
+            [
+                pluralize(errorCount, 'error', 'errors'),
+                pluralize(warningCount, 'warning', 'warnings'),
+                pluralize(informationCount, 'information', 'informations'),
+            ].join(', ')
         );
 
         if (status !== 0) {
-            core.setFailed(`${errorCount} ${errorCount === 1 ? 'error' : 'errors'}`);
+            core.setFailed(pluralize(errorCount, 'error', 'errors'));
         }
-    } catch (e: any) {
-        core.setFailed(e.message);
+    } catch (e) {
+        assert(typeof e === 'string' || e instanceof Error);
+        core.setFailed(e);
     }
-}
-
-async function getVersion(): Promise<SemVer> {
-    const versionSpec = core.getInput('version');
-    if (versionSpec) {
-        return new SemVer(versionSpec);
-    }
-
-    const client = new httpClient.HttpClient();
-    const resp = await client.get('https://registry.npmjs.org/pyright/latest');
-    const body = await resp.readBody();
-    const obj = JSON.parse(body);
-    return new SemVer(obj.version);
-}
-
-async function getArgs(version: SemVer) {
-    const pyrightIndex = await getPyright(version);
-
-    const args = [pyrightIndex];
-
-    const noComments = getBooleanInput('no-comments', false);
-    if (!noComments) {
-        args.push('--outputjson');
-    }
-
-    const pythonPlatform = core.getInput('python-platform');
-    if (pythonPlatform) {
-        args.push('--pythonplatform');
-        args.push(pythonPlatform);
-    }
-
-    const pythonVersion = core.getInput('python-version');
-    if (pythonVersion) {
-        args.push('--pythonversion');
-        args.push(pythonVersion);
-    }
-
-    const typeshedPath = core.getInput('typeshed-path');
-    if (typeshedPath) {
-        args.push('--typeshed-path');
-        args.push(typeshedPath);
-    }
-
-    const venvPath = core.getInput('venv-path');
-    if (venvPath) {
-        args.push('--venv-path');
-        args.push(venvPath);
-    }
-
-    const project = core.getInput('project');
-    if (project) {
-        args.push('--project');
-        args.push(project);
-    }
-
-    const lib = getBooleanInput('lib', false);
-    if (lib) {
-        args.push('--lib');
-    }
-
-    const warnings = getBooleanInput('warnings', false);
-    if (warnings) {
-        args.push('--warnings');
-    }
-
-    const extraArgs = core.getInput('extra-args');
-    if (extraArgs) {
-        args.push(...stringArgv(extraArgs));
-    }
-
-    const treatPartialAsWarning = getBooleanInput('warn-partial', false);
-
-    return {
-        args,
-        noComments,
-        treatPartialAsWarning
-    };
-}
-
-function getBooleanInput(name: string, defaultValue: boolean): boolean {
-    const input = core.getInput(name);
-    if (!input) {
-        return defaultValue;
-    }
-    return input.toUpperCase() === 'TRUE';
-}
-
-async function getPyright(version: SemVer): Promise<string> {
-    // Note: this only works because the pyright package doesn't have any
-    // dependencies. If this ever changes, we'll have to actually install it.
-    const url = `https://registry.npmjs.org/pyright/-/pyright-${version.format()}.tgz`;
-    const pyrightTarball = await tc.downloadTool(url);
-    const pyright = await tc.extractTar(pyrightTarball);
-    return path.join(pyright, 'package', 'index.js');
 }
 
 // Copied from pyright, with modifications.
@@ -199,10 +111,9 @@ function diagnosticToString(diag: Diagnostic, forCommand: boolean): string {
             message += `${diag.file}:`;
         }
         if (diag.range && !isEmptyRange(diag.range)) {
-            message += `${diag.range.start.line + 1}:${diag.range.start.character + 1} - `;
+            message += `${diag.range.start.line + 1}:${diag.range.start.character + 1} -`;
         }
-        message += diag.severity === 'information' ? 'info' : diag.severity;
-        message += `: `;
+        message += ` ${diag.severity}: `;
     }
 
     message += diag.message;
@@ -212,4 +123,8 @@ function diagnosticToString(diag: Diagnostic, forCommand: boolean): string {
     }
 
     return message;
+}
+
+function pluralize(n: number, singular: string, plural: string) {
+    return `${n} ${n === 1 ? singular : plural}`;
 }
