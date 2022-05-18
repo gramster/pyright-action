@@ -1,0 +1,401 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getActionVersion: core.getInput 1`] = `Array []`;
+
+exports[`getActionVersion: tc.cacheDir 1`] = `Array []`;
+
+exports[`getActionVersion: tc.downloadTool 1`] = `Array []`;
+
+exports[`getActionVersion: tc.extractTar 1`] = `Array []`;
+
+exports[`getActionVersion: tc.find 1`] = `Array []`;
+
+exports[`getArgs bad version: core.getInput 1`] = `
+Array [
+  Array [
+    "version",
+  ],
+]
+`;
+
+exports[`getArgs bad version: tc.cacheDir 1`] = `Array []`;
+
+exports[`getArgs bad version: tc.downloadTool 1`] = `Array []`;
+
+exports[`getArgs bad version: tc.extractTar 1`] = `Array []`;
+
+exports[`getArgs bad version: tc.find 1`] = `Array []`;
+
+exports[`getArgs valid version cached: core.getInput 1`] = `
+Array [
+  Array [
+    "version",
+  ],
+  Array [
+    "working-directory",
+  ],
+  Array [
+    "no-comments",
+  ],
+  Array [
+    "python-platform",
+  ],
+  Array [
+    "python-version",
+  ],
+  Array [
+    "typeshed-path",
+  ],
+  Array [
+    "venv-path",
+  ],
+  Array [
+    "project",
+  ],
+  Array [
+    "lib",
+  ],
+  Array [
+    "warnings",
+  ],
+  Array [
+    "verify-types",
+  ],
+  Array [
+    "extra-args",
+  ],
+]
+`;
+
+exports[`getArgs valid version cached: result 1`] = `
+Object {
+  "args": Array [
+    "<TEMP_DIR>/rootDir/cached/pyright/package/index.js",
+    "--outputjson",
+  ],
+  "noComments": false,
+  "pyrightVersion": "1.1.240",
+  "workingDirectory": "",
+}
+`;
+
+exports[`getArgs valid version cached: tc.cacheDir 1`] = `Array []`;
+
+exports[`getArgs valid version cached: tc.downloadTool 1`] = `Array []`;
+
+exports[`getArgs valid version cached: tc.extractTar 1`] = `Array []`;
+
+exports[`getArgs valid version cached: tc.find 1`] = `
+Array [
+  Array [
+    "pyright",
+    "1.1.240",
+  ],
+]
+`;
+
+exports[`getArgs valid version many options: core.getInput 1`] = `
+Array [
+  Array [
+    "version",
+  ],
+  Array [
+    "working-directory",
+  ],
+  Array [
+    "no-comments",
+  ],
+  Array [
+    "python-platform",
+  ],
+  Array [
+    "python-version",
+  ],
+  Array [
+    "typeshed-path",
+  ],
+  Array [
+    "venv-path",
+  ],
+  Array [
+    "project",
+  ],
+  Array [
+    "lib",
+  ],
+  Array [
+    "warnings",
+  ],
+  Array [
+    "verify-types",
+  ],
+  Array [
+    "extra-args",
+  ],
+]
+`;
+
+exports[`getArgs valid version many options: result 1`] = `
+Object {
+  "args": Array [
+    "<TEMP_DIR>/rootDir/cached/pyright/package/index.js",
+    "--outputjson",
+    "--pythonplatform",
+    "Linux",
+    "--pythonversion",
+    "3.9",
+    "--typeshed-path",
+    "/path/to/typeshed",
+    "--venv-path",
+    "/path/to-venv",
+    "--project",
+    "/path/to/pyrightconfig.json",
+    "--lib",
+    "--warnings",
+    "--foo",
+    "--bar",
+    "--baz",
+  ],
+  "noComments": false,
+  "pyrightVersion": "1.1.240",
+  "workingDirectory": "/path/to/project",
+}
+`;
+
+exports[`getArgs valid version many options: tc.cacheDir 1`] = `
+Array [
+  Array [
+    "<TEMP_DIR>/rootDir/pyright",
+    "pyright",
+    "1.1.240",
+  ],
+]
+`;
+
+exports[`getArgs valid version many options: tc.downloadTool 1`] = `
+Array [
+  Array [
+    "https://registry.npmjs.org/pyright/-/pyright-1.1.240.tgz",
+  ],
+]
+`;
+
+exports[`getArgs valid version many options: tc.extractTar 1`] = `
+Array [
+  Array [
+    "<TEMP_DIR>/rootDir/pyright.tar.gz",
+  ],
+]
+`;
+
+exports[`getArgs valid version many options: tc.find 1`] = `
+Array [
+  Array [
+    "pyright",
+    "1.1.240",
+  ],
+]
+`;
+
+exports[`getArgs valid version no comments: core.getInput 1`] = `
+Array [
+  Array [
+    "version",
+  ],
+  Array [
+    "working-directory",
+  ],
+  Array [
+    "no-comments",
+  ],
+  Array [
+    "python-platform",
+  ],
+  Array [
+    "python-version",
+  ],
+  Array [
+    "typeshed-path",
+  ],
+  Array [
+    "venv-path",
+  ],
+  Array [
+    "project",
+  ],
+  Array [
+    "lib",
+  ],
+  Array [
+    "warnings",
+  ],
+  Array [
+    "verify-types",
+  ],
+  Array [
+    "extra-args",
+  ],
+]
+`;
+
+exports[`getArgs valid version no comments: result 1`] = `
+Object {
+  "args": Array [
+    "<TEMP_DIR>/rootDir/cached/pyright/package/index.js",
+  ],
+  "noComments": true,
+  "pyrightVersion": "1.1.240",
+  "workingDirectory": "",
+}
+`;
+
+exports[`getArgs valid version no comments: tc.cacheDir 1`] = `
+Array [
+  Array [
+    "<TEMP_DIR>/rootDir/pyright",
+    "pyright",
+    "1.1.240",
+  ],
+]
+`;
+
+exports[`getArgs valid version no comments: tc.downloadTool 1`] = `
+Array [
+  Array [
+    "https://registry.npmjs.org/pyright/-/pyright-1.1.240.tgz",
+  ],
+]
+`;
+
+exports[`getArgs valid version no comments: tc.extractTar 1`] = `
+Array [
+  Array [
+    "<TEMP_DIR>/rootDir/pyright.tar.gz",
+  ],
+]
+`;
+
+exports[`getArgs valid version no comments: tc.find 1`] = `
+Array [
+  Array [
+    "pyright",
+    "1.1.240",
+  ],
+]
+`;
+
+exports[`getArgs valid version verifytypes: core.getInput 1`] = `
+Array [
+  Array [
+    "version",
+  ],
+  Array [
+    "working-directory",
+  ],
+  Array [
+    "no-comments",
+  ],
+  Array [
+    "python-platform",
+  ],
+  Array [
+    "python-version",
+  ],
+  Array [
+    "typeshed-path",
+  ],
+  Array [
+    "venv-path",
+  ],
+  Array [
+    "project",
+  ],
+  Array [
+    "lib",
+  ],
+  Array [
+    "warnings",
+  ],
+  Array [
+    "verify-types",
+  ],
+  Array [
+    "extra-args",
+  ],
+]
+`;
+
+exports[`getArgs valid version verifytypes: result 1`] = `
+Object {
+  "args": Array [
+    "<TEMP_DIR>/rootDir/cached/pyright/package/index.js",
+    "--outputjson",
+    "--verifytypes",
+    "some.package",
+  ],
+  "noComments": false,
+  "pyrightVersion": "1.1.240",
+  "workingDirectory": "",
+}
+`;
+
+exports[`getArgs valid version verifytypes: tc.cacheDir 1`] = `
+Array [
+  Array [
+    "<TEMP_DIR>/rootDir/pyright",
+    "pyright",
+    "1.1.240",
+  ],
+]
+`;
+
+exports[`getArgs valid version verifytypes: tc.downloadTool 1`] = `
+Array [
+  Array [
+    "https://registry.npmjs.org/pyright/-/pyright-1.1.240.tgz",
+  ],
+]
+`;
+
+exports[`getArgs valid version verifytypes: tc.extractTar 1`] = `
+Array [
+  Array [
+    "<TEMP_DIR>/rootDir/pyright.tar.gz",
+  ],
+]
+`;
+
+exports[`getArgs valid version verifytypes: tc.find 1`] = `
+Array [
+  Array [
+    "pyright",
+    "1.1.240",
+  ],
+]
+`;
+
+exports[`getArgs valid version version not found: core.getInput 1`] = `
+Array [
+  Array [
+    "version",
+  ],
+]
+`;
+
+exports[`getArgs valid version version not found: tc.cacheDir 1`] = `Array []`;
+
+exports[`getArgs valid version version not found: tc.downloadTool 1`] = `Array []`;
+
+exports[`getArgs valid version version not found: tc.extractTar 1`] = `Array []`;
+
+exports[`getArgs valid version version not found: tc.find 1`] = `Array []`;
+
+exports[`getNodeInfo: core.getInput 1`] = `Array []`;
+
+exports[`getNodeInfo: tc.cacheDir 1`] = `Array []`;
+
+exports[`getNodeInfo: tc.downloadTool 1`] = `Array []`;
+
+exports[`getNodeInfo: tc.extractTar 1`] = `Array []`;
+
+exports[`getNodeInfo: tc.find 1`] = `Array []`;

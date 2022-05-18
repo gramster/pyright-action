@@ -1,11 +1,14 @@
 # pyright-action
 
+[![ci](https://github.com/jakebailey/pyright-action/actions/workflows/ci.yml/badge.svg)](https://github.com/jakebailey/pyright-action/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/jakebailey/pyright-action/branch/main/graph/badge.svg?token=5OMEFS2LQZ)](https://codecov.io/gh/jakebailey/pyright-action)
+
 GitHub action for [pyright](https://github.com/microsoft/pyright).
 
 ```yml
 - uses: jakebailey/pyright-action@v1
   with:
-    version: 1.1.135 # Optional
+    version: 1.1.244 # Optional
 ```
 
 
@@ -38,6 +41,9 @@ inputs:
     description: 'Use library code to infer types when stubs are missing.'
     required: false
     default: 'false'
+  verify-types:
+    description: 'Package name to run the type verifier on; must be an *installed* library. Any score under 100% will fail the build.'
+    required: false
   extra-args:
     description: 'Extra arguments; can be used to specify specific files to check.'
     required: false
@@ -49,4 +55,18 @@ inputs:
     description: 'Treat partial unknowns as a warning, not an error.'
     required: false
     default: 'false'
+```
+
+
+## Releasing `pyright-action`
+
+Releases are performed by `release-it`, which correctly tags a new version and re-tags `v1`.
+Unfortunately, you can only publish a GitHub action via the web UI (not via the API), so
+`release-it` must be configured to open a browser to create the release, where the marketplace
+checkbox will already be checked.
+
+```
+$ yarn release --ci                    # Release a patch version
+$ yarn release --ci --increment minor  # Release a minor version bump.
+$ yarn release --ci --increment major  # Don't do this unless .release-it.json is updated to potentially retag a new major version.
 ```
